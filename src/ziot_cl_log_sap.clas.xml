@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>ZIOT_CL_LOG_EWM</CLSNAME>
+    <CLSNAME>ZIOT_CL_LOG_SAP</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>Logging: EWM Log</DESCRIPT>
+    <DESCRIPT>Logging: General Log</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>
@@ -18,6 +18,18 @@
      <ENTRY>Logging: Error Handling</ENTRY>
      <LENGTH>46</LENGTH>
     </item>
+    <item>
+     <ID>I</ID>
+     <KEY>001</KEY>
+     <ENTRY>Process runtime:</ENTRY>
+     <LENGTH>26</LENGTH>
+    </item>
+    <item>
+     <ID>I</ID>
+     <KEY>002</KEY>
+     <ENTRY>Line</ENTRY>
+     <LENGTH>14</LENGTH>
+    </item>
    </TPOOL>
    <I18N_TPOOL>
     <item>
@@ -28,6 +40,18 @@
        <KEY>000</KEY>
        <ENTRY>Logging: Fehlerbehandlung</ENTRY>
        <LENGTH>46</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>001</KEY>
+       <ENTRY>Prozesslaufzeit:</ENTRY>
+       <LENGTH>26</LENGTH>
+      </item>
+      <item>
+       <ID>I</ID>
+       <KEY>002</KEY>
+       <ENTRY>Zeile</ENTRY>
+       <LENGTH>14</LENGTH>
       </item>
      </TEXTPOOL>
     </item>
