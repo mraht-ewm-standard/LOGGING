@@ -1,10 +1,10 @@
 "! <p class="shorttext synchronized" lang="en">Logging: General Log</p>
-CLASS ziot_cl_log_sap DEFINITION
+CLASS zial_cl_log_sap DEFINITION
   PUBLIC
   CREATE PUBLIC.
 
   PUBLIC SECTION.
-    CONSTANTS: mc_class_name TYPE classname VALUE 'ZIOT_CL_LOG_SAP'.
+    CONSTANTS: mc_class_name TYPE classname VALUE 'ZIAL_CL_LOG_SAP'.
 
     "! Initialise log instance
     "!
@@ -19,7 +19,7 @@ CLASS ziot_cl_log_sap DEFINITION
         !iv_subobject     TYPE balsubobj
         !iv_extnumber     TYPE balnrext OPTIONAL
         !it_extnumber     TYPE stringtab OPTIONAL
-        !iv_callstack_lvl TYPE numc1 DEFAULT ziot_cl_log=>mc_callstack_lvl-info.
+        !iv_callstack_lvl TYPE numc1 DEFAULT zial_cl_log=>mc_callstack_lvl-info.
     "! Initialise log
     "!
     "! @parameter iv_extnumber | External number / description for a log
@@ -39,7 +39,7 @@ CLASS ziot_cl_log_sap DEFINITION
     "! @parameter msgde | Message details
     METHODS log_message
       IMPORTING
-        msgde TYPE ziot_cl_log=>t_input_parameters OPTIONAL.
+        msgde TYPE zial_cl_log=>t_input_parameters OPTIONAL.
     "! Log exception
     "!
     "! @parameter io_exception | Exception object
@@ -78,7 +78,7 @@ CLASS ziot_cl_log_sap DEFINITION
         !msgv2 TYPE symsgv OPTIONAL
         !msgv3 TYPE symsgv OPTIONAL
         !msgv4 TYPE symsgv OPTIONAL
-        !msgde TYPE ziot_cl_log=>t_input_parameters OPTIONAL.
+        !msgde TYPE zial_cl_log=>t_input_parameters OPTIONAL.
     "! Log name of development object which called the function to be logged
     "!
     METHODS log_caller .
@@ -99,7 +99,7 @@ CLASS ziot_cl_log_sap DEFINITION
         !msgv2 TYPE symsgv OPTIONAL
         !msgv3 TYPE symsgv OPTIONAL
         !msgv4 TYPE symsgv OPTIONAL
-        !msgde TYPE ziot_cl_log=>t_input_parameters OPTIONAL.
+        !msgde TYPE zial_cl_log=>t_input_parameters OPTIONAL.
     "! Log success message
     "!
     "! @parameter msgtx | Message text
@@ -117,7 +117,7 @@ CLASS ziot_cl_log_sap DEFINITION
         !msgv2 TYPE symsgv OPTIONAL
         !msgv3 TYPE symsgv OPTIONAL
         !msgv4 TYPE symsgv OPTIONAL
-        !msgde TYPE ziot_cl_log=>t_input_parameters OPTIONAL.
+        !msgde TYPE zial_cl_log=>t_input_parameters OPTIONAL.
     "! Log error message
     "!
     "! @parameter msgtx | Message text
@@ -135,7 +135,7 @@ CLASS ziot_cl_log_sap DEFINITION
         !msgv2 TYPE symsgv OPTIONAL
         !msgv3 TYPE symsgv OPTIONAL
         !msgv4 TYPE symsgv OPTIONAL
-        !msgde TYPE ziot_cl_log=>t_input_parameters OPTIONAL.
+        !msgde TYPE zial_cl_log=>t_input_parameters OPTIONAL.
     "! Save log to application log and optionally close log instance
     "!
     "! @parameter iv_finalize | Finalize/close log? (Y/N)
@@ -169,16 +169,16 @@ CLASS ziot_cl_log_sap DEFINITION
           mt_log_protocol TYPE bapirettab,
           mv_log_counter  TYPE i.
 
-    DATA: mv_msg_param_id     TYPE ziot_cl_log=>v_message_param_id,
+    DATA: mv_msg_param_id     TYPE zial_cl_log=>v_message_param_id,
           mt_msg_detail       TYPE /scwm/tt_msg_details,
-          mt_msg_detail_input TYPE ziot_cl_log=>t_input_parameters.
+          mt_msg_detail_input TYPE zial_cl_log=>t_input_parameters.
 
     CLASS-METHODS error_handling
       IMPORTING
         !iv_process       TYPE char4
         !iv_subrc         TYPE sysubrc
         !io_exception     TYPE REF TO cx_root
-        !is_log_msg       TYPE ziot_s_log_msg
+        !is_log_msg       TYPE zial_s_log_msg
       RETURNING
         VALUE(rt_bapiret) TYPE bapirettab.
 
@@ -215,7 +215,7 @@ CLASS ziot_cl_log_sap DEFINITION
         !iv_msgv2        TYPE symsgv   OPTIONAL
         !iv_msgv3        TYPE symsgv   OPTIONAL
         !iv_msgv4        TYPE symsgv   OPTIONAL
-        !it_msgde        TYPE ziot_cl_log=>t_input_parameters OPTIONAL
+        !it_msgde        TYPE zial_cl_log=>t_input_parameters OPTIONAL
         !iv_is_dummy_msg TYPE abap_bool DEFAULT abap_false.
     METHODS add_msg_by_message_text .
     METHODS add_msg_by_message_object .
@@ -241,28 +241,28 @@ CLASS ziot_cl_log_sap DEFINITION
 ENDCLASS.
 
 
-CLASS ziot_cl_log_sap IMPLEMENTATION.
+CLASS zial_cl_log_sap IMPLEMENTATION.
 
   METHOD add_message_callstack.
 
     CHECK mv_callstack_lvl > 0.
 
     CASE mv_msg_type.
-      WHEN ziot_cl_log=>mc_log_type-info.
-        CHECK mv_callstack_lvl >= ziot_cl_log=>mc_callstack_lvl-info.
+      WHEN zial_cl_log=>mc_log_type-info.
+        CHECK mv_callstack_lvl >= zial_cl_log=>mc_callstack_lvl-info.
 
-      WHEN ziot_cl_log=>mc_log_type-success.
-        CHECK mv_callstack_lvl >= ziot_cl_log=>mc_callstack_lvl-success.
+      WHEN zial_cl_log=>mc_log_type-success.
+        CHECK mv_callstack_lvl >= zial_cl_log=>mc_callstack_lvl-success.
 
-      WHEN ziot_cl_log=>mc_log_type-warning.
-        CHECK mv_callstack_lvl >= ziot_cl_log=>mc_callstack_lvl-warning.
+      WHEN zial_cl_log=>mc_log_type-warning.
+        CHECK mv_callstack_lvl >= zial_cl_log=>mc_callstack_lvl-warning.
 
-      WHEN ziot_cl_log=>mc_log_type-error.
-        CHECK mv_callstack_lvl >= ziot_cl_log=>mc_callstack_lvl-error.
+      WHEN zial_cl_log=>mc_log_type-error.
+        CHECK mv_callstack_lvl >= zial_cl_log=>mc_callstack_lvl-error.
 
     ENDCASE.
 
-    ziot_cl_session=>get_callstack(
+    zial_cl_session=>get_callstack(
       IMPORTING
         et_callstack = DATA(lt_callstack) ).
     DELETE lt_callstack WHERE mainprogram CS mc_class_name.
@@ -279,16 +279,16 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
 
   METHOD add_message_context.
 
-    ziot_cl_session=>get_context(
+    zial_cl_session=>get_context(
       IMPORTING
         ev_program   = DATA(lv_program)
         ev_blockname = DATA(lv_include)
         ev_line      = DATA(lv_line) ).
 
-    ms_msg_context = VALUE #( value   = VALUE ziot_s_log_context( program = lv_program
+    ms_msg_context = VALUE #( value   = VALUE zial_s_log_context( program = lv_program
                                                                   include = lv_include
                                                                   line    = lv_line )
-                              tabname = ziot_cl_log=>mc_log_context_struct ).
+                              tabname = zial_cl_log=>mc_log_context_struct ).
 
   ENDMETHOD.
 
@@ -298,12 +298,12 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
     CHECK mt_msg_detail_input IS NOT INITIAL.
 
     " Add message identifier, example SBAL_CALLBACK
-    ms_msg_params-callback = VALUE #( userexitp = ziot_cl_log=>mc_msgde_callback-report
-                                      userexitf = ziot_cl_log=>mc_msgde_callback-routine
+    ms_msg_params-callback = VALUE #( userexitp = zial_cl_log=>mc_msgde_callback-report
+                                      userexitf = zial_cl_log=>mc_msgde_callback-routine
                                       userexitt = space ).
 
     mv_msg_param_id = mv_msg_param_id + 1.
-    APPEND VALUE #( parname  = ziot_cl_log=>mc_msg_ident
+    APPEND VALUE #( parname  = zial_cl_log=>mc_msg_ident
                     parvalue = mv_msg_param_id ) TO ms_msg_params-t_par.
 
     APPEND VALUE #( v_id              = mv_msg_param_id
@@ -346,7 +346,7 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
         add_msg_to_log_protocol( ls_msg_handle ).
 
       WHEN OTHERS.
-        handle_error( iv_process = ziot_cl_log=>mc_log_process-create
+        handle_error( iv_process = zial_cl_log=>mc_log_process-create
                       iv_subrc   = sy-subrc ).
 
     ENDCASE.
@@ -379,7 +379,7 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
         add_msg_to_log_protocol( ls_msg_handle ).
 
       WHEN OTHERS.
-        handle_error( iv_process = ziot_cl_log=>mc_log_process-create
+        handle_error( iv_process = zial_cl_log=>mc_log_process-create
                       iv_subrc   = sy-subrc ).
 
     ENDCASE.
@@ -522,10 +522,10 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
     ENDIF.
 
     CASE mv_msg_content_type.
-      WHEN ziot_cl_log=>mc_msg_content_type-obj.
+      WHEN zial_cl_log=>mc_msg_content_type-obj.
         add_msg_by_message_object( ).
 
-      WHEN ziot_cl_log=>mc_msg_content_type-txt.
+      WHEN zial_cl_log=>mc_msg_content_type-txt.
         add_msg_by_message_text( ).
 
     ENDCASE.
@@ -539,7 +539,7 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
 
     CHECK mv_caller CO ' _0'.
 
-    ziot_cl_session=>get_callstack(
+    zial_cl_session=>get_callstack(
       IMPORTING
         ev_function = DATA(lv_function)
         ev_method   = DATA(lv_method)
@@ -570,7 +570,7 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
 
   METHOD error.
 
-    create_message( iv_msgty = ziot_cl_log=>mc_log_type-error
+    create_message( iv_msgty = zial_cl_log=>mc_log_type-error
                     iv_msgtx = msgtx
                     iv_msgno = msgno
                     iv_msgv1 = msgv1
@@ -590,7 +590,7 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
     mv_has_error = abap_true.
 
 *** Backup input data
-    DATA(ls_log_msg) = VALUE ziot_s_log_msg( hdr = VALUE #( object     = ms_log_header-object
+    DATA(ls_log_msg) = VALUE zial_s_log_msg( hdr = VALUE #( object     = ms_log_header-object
                                                             subobject  = ms_log_header-subobject
                                                             extnumber  = ms_log_header-extnumber
                                                             aldate_del = ms_log_header-aldate_del )
@@ -604,14 +604,14 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
                                                             msgv4 = mv_msg_var4 ) ).
 
     " Try to add error messages regarding failed logging to old log
-    MESSAGE e001(ziot_log) INTO DATA(lv_msg).
+    MESSAGE e001(zial_log) INTO DATA(lv_msg).
     log_message( ).
 
 *** Close existing log and create a new one for error handling
     save( ).
 
-    DATA(lo_log_sap) = NEW ziot_cl_log_sap( iv_object    = ziot_cl_log=>mc_dflt_log_object
-                                            iv_subobject = ziot_cl_log=>mc_log_subobject_log
+    DATA(lo_log_sap) = NEW zial_cl_log_sap( iv_object    = zial_cl_log=>mc_dflt_log_object
+                                            iv_subobject = zial_cl_log=>mc_log_subobject_log
                                             iv_extnumber = TEXT-000 ).
 
     DATA(lt_bapiret) = error_handling( iv_process   = iv_process
@@ -635,101 +635,101 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
 
   METHOD error_handling.
 
-    MESSAGE e000(ziot_log) WITH iv_process INTO DATA(lv_msg).
-    APPEND ziot_cl_log=>to_bapiret( iv_symsg = abap_true ) TO rt_bapiret.
+    MESSAGE e000(zial_log) WITH iv_process INTO DATA(lv_msg).
+    APPEND zial_cl_log=>to_bapiret( iv_symsg = abap_true ) TO rt_bapiret.
 
 *** Log general log data
     DATA(lv_msg_txt_gen) = CONV bapi_msg( |; OBJECT: { is_log_msg-hdr-object }; | &&
                                           |SUBOBJ: { is_log_msg-hdr-subobject }| &&
                                           |; EXTNUM: { is_log_msg-hdr-extnumber }; | &&
                                           |ALDDEL: { is_log_msg-hdr-aldate_del }| ).
-    APPEND ziot_cl_log=>to_bapiret( iv_msgty = ziot_cl_log=>mc_log_type-error
+    APPEND zial_cl_log=>to_bapiret( iv_msgty = zial_cl_log=>mc_log_type-error
                                     iv_msgtx = lv_msg_txt_gen ) TO rt_bapiret.
 
     CASE iv_process.
-      WHEN ziot_cl_log=>mc_log_process-init.
+      WHEN zial_cl_log=>mc_log_process-init.
         CASE iv_subrc.
           WHEN 1.
-            MESSAGE e006(ziot_log) WITH iv_subrc INTO lv_msg.
+            MESSAGE e006(zial_log) WITH iv_subrc INTO lv_msg.
 
           WHEN OTHERS.
-            MESSAGE e007(ziot_log) WITH iv_subrc INTO lv_msg.
+            MESSAGE e007(zial_log) WITH iv_subrc INTO lv_msg.
 
         ENDCASE.
 
-      WHEN ziot_cl_log=>mc_log_process-save.
+      WHEN zial_cl_log=>mc_log_process-save.
         CASE iv_subrc.
           WHEN 1.
-            MESSAGE e008(ziot_log) WITH iv_subrc INTO lv_msg.
+            MESSAGE e008(zial_log) WITH iv_subrc INTO lv_msg.
 
           WHEN 2.
-            MESSAGE e009(ziot_log) WITH iv_subrc INTO lv_msg.
+            MESSAGE e009(zial_log) WITH iv_subrc INTO lv_msg.
 
           WHEN 3.
-            MESSAGE e010(ziot_log) WITH iv_subrc INTO lv_msg.
+            MESSAGE e010(zial_log) WITH iv_subrc INTO lv_msg.
 
           WHEN OTHERS.
-            MESSAGE e011(ziot_log) WITH iv_subrc INTO lv_msg.
+            MESSAGE e011(zial_log) WITH iv_subrc INTO lv_msg.
 
         ENDCASE.
 
       WHEN OTHERS.
         CASE sy-subrc.
           WHEN 1.
-            MESSAGE e008(ziot_log) WITH iv_subrc INTO lv_msg.
+            MESSAGE e008(zial_log) WITH iv_subrc INTO lv_msg.
 
           WHEN 2.
-            MESSAGE e012(ziot_log) WITH iv_subrc INTO lv_msg.
+            MESSAGE e012(zial_log) WITH iv_subrc INTO lv_msg.
 
           WHEN 3.
-            MESSAGE e013(ziot_log) WITH iv_subrc INTO lv_msg.
+            MESSAGE e013(zial_log) WITH iv_subrc INTO lv_msg.
 
           WHEN OTHERS.
-            MESSAGE e014(ziot_log) WITH iv_subrc INTO lv_msg.
+            MESSAGE e014(zial_log) WITH iv_subrc INTO lv_msg.
 
         ENDCASE.
 
     ENDCASE.
 
-    APPEND ziot_cl_log=>to_bapiret( iv_symsg = abap_true ) TO rt_bapiret.
+    APPEND zial_cl_log=>to_bapiret( iv_symsg = abap_true ) TO rt_bapiret.
 
 *** Log process-specific log data
     CASE iv_process.
-      WHEN ziot_cl_log=>mc_log_process-init.
+      WHEN zial_cl_log=>mc_log_process-init.
         " Nothing to log
 
-      WHEN ziot_cl_log=>mc_log_process-create.
+      WHEN zial_cl_log=>mc_log_process-create.
         IF is_log_msg-msg-msgtx CN ' _0'.
 
-          MESSAGE e015(ziot_log) WITH is_log_msg-msg-msgty INTO lv_msg.
-          APPEND ziot_cl_log=>to_bapiret( iv_symsg = abap_true ) TO rt_bapiret.
+          MESSAGE e015(zial_log) WITH is_log_msg-msg-msgty INTO lv_msg.
+          APPEND zial_cl_log=>to_bapiret( iv_symsg = abap_true ) TO rt_bapiret.
 
         ELSEIF is_log_msg-msg-msgno CN ' _0'.
 
-          MESSAGE e003(ziot_log) WITH is_log_msg-msg-msgno
+          MESSAGE e003(zial_log) WITH is_log_msg-msg-msgno
                                       is_log_msg-msg-msgid INTO lv_msg.
-          APPEND ziot_cl_log=>to_bapiret( iv_symsg = abap_true ) TO rt_bapiret.
+          APPEND zial_cl_log=>to_bapiret( iv_symsg = abap_true ) TO rt_bapiret.
 
-          MESSAGE e004(ziot_log) WITH is_log_msg-msg-msgv1
+          MESSAGE e004(zial_log) WITH is_log_msg-msg-msgv1
                                       is_log_msg-msg-msgv2
                                       is_log_msg-msg-msgv3
                                       is_log_msg-msg-msgv4 INTO lv_msg.
-          APPEND ziot_cl_log=>to_bapiret( iv_symsg = abap_true ) TO rt_bapiret.
+          APPEND zial_cl_log=>to_bapiret( iv_symsg = abap_true ) TO rt_bapiret.
 
         ELSE.
 
-          MESSAGE e002(ziot_log) INTO lv_msg.
-          APPEND ziot_cl_log=>to_bapiret( iv_symsg = abap_true ) TO rt_bapiret.
+          MESSAGE e002(zial_log) INTO lv_msg.
+          APPEND zial_cl_log=>to_bapiret( iv_symsg = abap_true ) TO rt_bapiret.
 
         ENDIF.
 
-      WHEN ziot_cl_log=>mc_log_process-exception.
+      WHEN zial_cl_log=>mc_log_process-exception.
         DATA(lo_exc_descr) = NEW cl_instance_description( io_exception ).
 
-        MESSAGE e005(ziot_log) WITH lo_exc_descr->class_name INTO lv_msg.
-        APPEND ziot_cl_log=>to_bapiret( iv_symsg = abap_true ) TO rt_bapiret.
+        MESSAGE e005(zial_log) WITH lo_exc_descr->class_name INTO lv_msg.
+        APPEND zial_cl_log=>to_bapiret( iv_symsg = abap_true ) TO rt_bapiret.
 
-      WHEN ziot_cl_log=>mc_log_process-save.
+      WHEN zial_cl_log=>mc_log_process-save.
         " Nothing to log
 
     ENDCASE.
@@ -746,7 +746,7 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
 
   METHOD info.
 
-    create_message( iv_msgty = ziot_cl_log=>mc_log_type-info
+    create_message( iv_msgty = zial_cl_log=>mc_log_type-info
                     iv_msgtx = msgtx
                     iv_msgno = msgno
                     iv_msgv1 = msgv1
@@ -813,7 +813,7 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
 
     me->det_caller( ).
 
-    create_message( iv_msgty        = ziot_cl_log=>mc_log_type-success
+    create_message( iv_msgty        = zial_cl_log=>mc_log_type-success
                     iv_msgtx        = |***** { mv_caller } at { me->add_timestamp( ) } *****|
                     iv_is_dummy_msg = abap_true ).
 
@@ -829,8 +829,8 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
           DATA(lv_duration) = cl_abap_tstmp=>subtract( tstmp1 = mv_process_end
                                                        tstmp2 = mv_process_bgn ) * 1000.
 
-          me->create_message( iv_msgty        = ziot_cl_log=>mc_log_type-success
-                              iv_msgtx        = CONV #( ziot_cl_text=>get_by_enc_text( |{ TEXT-001 } { lv_duration } ms| ) )
+          me->create_message( iv_msgty        = zial_cl_log=>mc_log_type-success
+                              iv_msgtx        = CONV #( zial_cl_text=>get_by_enc_text( |{ TEXT-001 } { lv_duration } ms| ) )
                               iv_is_dummy_msg = abap_true ).
 
         CATCH cx_root.
@@ -855,7 +855,7 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
                               t_par  = VALUE #( ( parname  = 'EXCEPTION'
                                                   parvalue = lo_exc_descr->class_name ) ) ).
 
-    me->create_message( iv_msgty = ziot_cl_log=>mc_log_type-error
+    me->create_message( iv_msgty = zial_cl_log=>mc_log_type-error
                     iv_msgtx = mv_msg_text
                     iv_msgno = mv_msg_number
                     iv_msgv1 = mv_msg_var1
@@ -868,7 +868,7 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
 
   METHOD log_line.
 
-    create_message( iv_msgty        = ziot_cl_log=>mc_log_type-success
+    create_message( iv_msgty        = zial_cl_log=>mc_log_type-success
                     iv_msgtx        = repeat( val = '-' occ = 255 )
                     iv_is_dummy_msg = abap_true ).
 
@@ -894,28 +894,28 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
     mv_msg_class = is_symsg-msgid.
 
     CASE is_symsg-msgty.
-      WHEN ziot_cl_log=>mc_log_type-info.
+      WHEN zial_cl_log=>mc_log_type-info.
         info( msgno = is_symsg-msgno
               msgv1 = is_symsg-msgv1
               msgv2 = is_symsg-msgv2
               msgv3 = is_symsg-msgv3
               msgv4 = is_symsg-msgv4 ).
 
-      WHEN ziot_cl_log=>mc_log_type-success.
+      WHEN zial_cl_log=>mc_log_type-success.
         success( msgno = is_symsg-msgno
                  msgv1 = is_symsg-msgv1
                  msgv2 = is_symsg-msgv2
                  msgv3 = is_symsg-msgv3
                  msgv4 = is_symsg-msgv4 ).
 
-      WHEN ziot_cl_log=>mc_log_type-warning.
+      WHEN zial_cl_log=>mc_log_type-warning.
         warning( msgno = is_symsg-msgno
                  msgv1 = is_symsg-msgv1
                  msgv2 = is_symsg-msgv2
                  msgv3 = is_symsg-msgv3
                  msgv4 = is_symsg-msgv4 ).
 
-      WHEN ziot_cl_log=>mc_log_type-error.
+      WHEN zial_cl_log=>mc_log_type-error.
         error( msgno = is_symsg-msgno
                msgv1 = is_symsg-msgv1
                msgv2 = is_symsg-msgv2
@@ -993,7 +993,7 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
         CLEAR: me->ms_log_header,
                me->mv_log_handle.
 
-        me->handle_error( iv_process = ziot_cl_log=>mc_log_process-save
+        me->handle_error( iv_process = zial_cl_log=>mc_log_process-save
                           iv_subrc   = sy-subrc ).
 
     ENDCASE.
@@ -1061,7 +1061,7 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
 
       ENDDO.
 
-      mv_msg_content_type = ziot_cl_log=>mc_msg_content_type-txt.
+      mv_msg_content_type = zial_cl_log=>mc_msg_content_type-txt.
 
     ELSEIF msgno CN ' _'.
 
@@ -1072,7 +1072,7 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
       mv_msg_var3 = msgv3.
       mv_msg_var4 = msgv4.
 
-      mv_msg_content_type = ziot_cl_log=>mc_msg_content_type-obj.
+      mv_msg_content_type = zial_cl_log=>mc_msg_content_type-obj.
 
     ELSE.
 
@@ -1086,17 +1086,17 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
   METHOD set_priority.
 
     CASE mv_msg_type.
-      WHEN ziot_cl_log=>mc_log_type-info.
-        mv_msg_priority = ziot_cl_log=>mc_log_type-info_prio.    " Additional information
+      WHEN zial_cl_log=>mc_log_type-info.
+        mv_msg_priority = zial_cl_log=>mc_log_type-info_prio.    " Additional information
 
-      WHEN ziot_cl_log=>mc_log_type-success.
-        mv_msg_priority = ziot_cl_log=>mc_log_type-success_prio. " Medium important
+      WHEN zial_cl_log=>mc_log_type-success.
+        mv_msg_priority = zial_cl_log=>mc_log_type-success_prio. " Medium important
 
-      WHEN ziot_cl_log=>mc_log_type-warning.
-        mv_msg_priority = ziot_cl_log=>mc_log_type-warning_prio. " Important
+      WHEN zial_cl_log=>mc_log_type-warning.
+        mv_msg_priority = zial_cl_log=>mc_log_type-warning_prio. " Important
 
-      WHEN ziot_cl_log=>mc_log_type-error.
-        mv_msg_priority = ziot_cl_log=>mc_log_type-error_prio.   " Very important
+      WHEN zial_cl_log=>mc_log_type-error.
+        mv_msg_priority = zial_cl_log=>mc_log_type-error_prio.   " Very important
 
     ENDCASE.
 
@@ -1105,7 +1105,7 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
 
   METHOD success.
 
-    create_message( iv_msgty = ziot_cl_log=>mc_log_type-success
+    create_message( iv_msgty = zial_cl_log=>mc_log_type-success
                     iv_msgtx = msgtx
                     iv_msgno = msgno
                     iv_msgv1 = msgv1
@@ -1119,7 +1119,7 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
 
   METHOD warning.
 
-    create_message( iv_msgty = ziot_cl_log=>mc_log_type-warning
+    create_message( iv_msgty = zial_cl_log=>mc_log_type-warning
                     iv_msgtx = msgtx
                     iv_msgno = msgno
                     iv_msgv1 = msgv1
@@ -1144,7 +1144,7 @@ CLASS ziot_cl_log_sap IMPLEMENTATION.
 
     IF    sy-subrc     NE 0
       AND mv_has_error EQ abap_false.
-      me->handle_error( iv_process = ziot_cl_log=>mc_log_process-init
+      me->handle_error( iv_process = zial_cl_log=>mc_log_process-init
                         iv_subrc   = sy-subrc ).
     ENDIF.
 

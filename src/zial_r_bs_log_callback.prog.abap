@@ -1,16 +1,16 @@
 *&---------------------------------------------------------------------*
-*& Report ziot_r_bs_log_callback
+*& Report zial_r_bs_log_callback
 *&---------------------------------------------------------------------*
 *&
 *&---------------------------------------------------------------------*
-REPORT ziot_r_bs_log_callback.
+REPORT zial_r_bs_log_callback.
 
 FORM on_click_msg_detail TABLES i_params STRUCTURE spar.
 
   CONSTANTS: lc_log_number TYPE spo_par VALUE '%LOGNUMBER'.
 
   DATA: lv_log_number     TYPE balognr,
-        lv_msg_param_id   TYPE ziot_cl_log=>v_message_param_id,
+        lv_msg_param_id   TYPE zial_cl_log=>v_message_param_id,
         ls_structure_name TYPE dd02l-tabname.
 
   FIELD-SYMBOLS: <lt_outtab> TYPE STANDARD TABLE.
@@ -29,38 +29,38 @@ FORM on_click_msg_detail TABLES i_params STRUCTURE spar.
 
   CHECK lt_msg_details IS NOT INITIAL.
 
-  lv_msg_param_id = VALUE #( i_params[ param = ziot_cl_log=>mc_msg_ident ]-value OPTIONAL ).
+  lv_msg_param_id = VALUE #( i_params[ param = zial_cl_log=>mc_msg_ident ]-value OPTIONAL ).
   CHECK lv_msg_param_id IS NOT INITIAL.
 
   " Search for those entries which belong to this message
   ASSIGN lt_msg_details[ v_id = lv_msg_param_id ] TO FIELD-SYMBOL(<ls_msg_details>).
   CHECK <ls_msg_details> IS ASSIGNED.
 
-  IF ziot_cl_log=>mo_gui_alv_grid IS NOT INITIAL.
-    ziot_cl_log=>mo_gui_alv_grid->free( ).
-    CLEAR ziot_cl_log=>mo_gui_alv_grid.
+  IF zial_cl_log=>mo_gui_alv_grid IS NOT INITIAL.
+    zial_cl_log=>mo_gui_alv_grid->free( ).
+    CLEAR zial_cl_log=>mo_gui_alv_grid.
   ENDIF.
 
   "    Show container if not visible
   " OR Hide container if detail to same message was again being selected
-  IF    ziot_cl_log=>mo_gui_docking_container IS BOUND
-    AND ziot_cl_log=>mv_sel_msg_param_id EQ lv_msg_param_id.
+  IF    zial_cl_log=>mo_gui_docking_container IS BOUND
+    AND zial_cl_log=>mv_sel_msg_param_id EQ lv_msg_param_id.
 
-    ziot_cl_log=>mo_gui_docking_container->free( ).
-    CLEAR: ziot_cl_log=>mo_gui_docking_container,
-           ziot_cl_log=>mv_sel_msg_param_id.
+    zial_cl_log=>mo_gui_docking_container->free( ).
+    CLEAR: zial_cl_log=>mo_gui_docking_container,
+           zial_cl_log=>mv_sel_msg_param_id.
 
-  ELSEIF ziot_cl_log=>mo_gui_docking_container IS NOT BOUND.
+  ELSEIF zial_cl_log=>mo_gui_docking_container IS NOT BOUND.
 
-    ziot_cl_log=>mo_gui_docking_container = NEW #( side      = cl_gui_docking_container=>dock_at_bottom
+    zial_cl_log=>mo_gui_docking_container = NEW #( side      = cl_gui_docking_container=>dock_at_bottom
                                                    extension = '120' ).
-    ziot_cl_log=>mo_gui_docking_container->set_visible( abap_true ).
+    zial_cl_log=>mo_gui_docking_container->set_visible( abap_true ).
 
   ENDIF.
 
-  CHECK ziot_cl_log=>mo_gui_docking_container IS BOUND.
+  CHECK zial_cl_log=>mo_gui_docking_container IS BOUND.
 
-  ziot_cl_log=>mo_gui_alv_grid = NEW #( i_parent = ziot_cl_log=>mo_gui_docking_container ).
+  zial_cl_log=>mo_gui_alv_grid = NEW #( i_parent = zial_cl_log=>mo_gui_docking_container ).
 
   DATA(ls_layout) = VALUE lvc_s_layo( cwidth_opt = 'X'
                                       sel_mode   = 'D' ).
@@ -78,7 +78,7 @@ FORM on_click_msg_detail TABLES i_params STRUCTURE spar.
 
   CHECK <lt_outtab> IS ASSIGNED.
 
-  ziot_cl_log=>mo_gui_alv_grid->set_table_for_first_display(
+  zial_cl_log=>mo_gui_alv_grid->set_table_for_first_display(
     EXPORTING
       i_structure_name     = ls_structure_name
       is_layout            = ls_layout
@@ -86,6 +86,6 @@ FORM on_click_msg_detail TABLES i_params STRUCTURE spar.
     CHANGING
       it_outtab            = <lt_outtab> ).
 
-  ziot_cl_log=>mv_sel_msg_param_id = lv_msg_param_id.
+  zial_cl_log=>mv_sel_msg_param_id = lv_msg_param_id.
 
 ENDFORM.

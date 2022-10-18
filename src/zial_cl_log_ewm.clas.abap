@@ -1,9 +1,9 @@
 "! <p class="shorttext synchronized" lang="en">Logging: EWM Log</p>
-CLASS ziot_cl_log_ewm DEFINITION
+CLASS zial_cl_log_ewm DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC
-  INHERITING FROM ziot_cl_log_sap.
+  INHERITING FROM zial_cl_log_sap.
 
   PUBLIC SECTION.
     METHODS constructor
@@ -14,7 +14,7 @@ CLASS ziot_cl_log_ewm DEFINITION
         !iv_subobject     TYPE balsubobj
         !iv_extnumber     TYPE balnrext OPTIONAL
         !it_extnumber     TYPE stringtab OPTIONAL
-        !iv_callstack_lvl TYPE numc1 DEFAULT ziot_cl_log=>mc_callstack_lvl-info.
+        !iv_callstack_lvl TYPE numc1 DEFAULT zial_cl_log=>mc_callstack_lvl-info.
 
     "! Log SAP log messages
     "!
@@ -42,12 +42,12 @@ CLASS ziot_cl_log_ewm DEFINITION
 
 
   PROTECTED SECTION.
-    CONSTANTS: class_name TYPE classname VALUE 'ZIOT_CL_LOG'.
+    CONSTANTS: class_name TYPE classname VALUE 'ZIAL_CL_LOG'.
 
     CONSTANTS: message_text_id TYPE symsgid VALUE 'BL' ##NO_TEXT,
                message_text_no TYPE symsgno VALUE '001' ##NO_TEXT.
 
-    CLASS-DATA: mo_instance   TYPE REF TO ziot_cl_log_ewm,
+    CLASS-DATA: mo_instance   TYPE REF TO zial_cl_log_ewm,
                 mv_has_error  TYPE abap_bool,
                 mv_save_error TYPE abap_bool.
 
@@ -83,7 +83,7 @@ ENDCLASS.
 
 
 
-CLASS ziot_cl_log_ewm IMPLEMENTATION.
+CLASS zial_cl_log_ewm IMPLEMENTATION.
 
   METHOD add_msg_by_message_object.
 
@@ -168,7 +168,7 @@ CLASS ziot_cl_log_ewm IMPLEMENTATION.
     mv_has_error = abap_true.
 
 *** Backup input data
-    DATA(ls_log_msg) = VALUE ziot_s_log_msg( hdr = VALUE #( object     = ms_log_header-object
+    DATA(ls_log_msg) = VALUE zial_s_log_msg( hdr = VALUE #( object     = ms_log_header-object
                                                             subobject  = ms_log_header-subobject
                                                             extnumber  = ms_log_header-extnumber
                                                             aldate_del = ms_log_header-aldate_del )
@@ -182,15 +182,15 @@ CLASS ziot_cl_log_ewm IMPLEMENTATION.
                                                             msgv4 = mv_msg_var4 ) ).
 
     " Try to add error messages regarding failed logging to old log
-    MESSAGE e001(ziot_log) INTO DATA(lv_msg).
+    MESSAGE e001(zial_log) INTO DATA(lv_msg).
     log_message( ).
 
 *** Close existing log and create a new one for error handling
     save( ).
 
-    DATA(lo_log_sap) = NEW ziot_cl_log_ewm( iv_lgnum       = me->mv_lgnum
-                                            iv_object      = ziot_cl_log=>mc_dflt_log_object
-                                            iv_subobject   = ziot_cl_log=>mc_log_subobject_log
+    DATA(lo_log_sap) = NEW zial_cl_log_ewm( iv_lgnum       = me->mv_lgnum
+                                            iv_object      = zial_cl_log=>mc_dflt_log_object
+                                            iv_subobject   = zial_cl_log=>mc_log_subobject_log
                                             iv_extnumber   = TEXT-000 ).
 
     DATA(lt_bapiret) = error_handling( iv_process   = iv_process

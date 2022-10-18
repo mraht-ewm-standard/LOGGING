@@ -1,5 +1,5 @@
 *&---------------------------------------------------------------------*
-*& Report ZIOT_R_APPLOG_SEARCH
+*& Report ZIAL_R_APPLOG_SEARCH
 *&---------------------------------------------------------------------*
 *&
 *&---------------------------------------------------------------------*
@@ -9,7 +9,7 @@ INCLUDE sbaltype.
 
 TABLES balhdr.
 
-CONSTANTS: gc_log_context TYPE string VALUE 'ZIOT_S_LOG_CONTEXT'.
+CONSTANTS: gc_log_context TYPE string VALUE 'ZIAL_S_LOG_CONTEXT'.
 
 DATA gs_log_filter        TYPE bal_s_lfil.
 DATA gt_log_header        TYPE balhdr_t.

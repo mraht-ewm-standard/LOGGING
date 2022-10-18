@@ -1,5 +1,5 @@
 "! <p class="shorttext synchronized" lang="en">Logging</p>
-CLASS ziot_cl_log DEFINITION
+CLASS zial_cl_log DEFINITION
   PUBLIC
   CREATE PRIVATE .
 
@@ -10,7 +10,7 @@ CLASS ziot_cl_log DEFINITION
            t_input_parameters TYPE rsra_t_alert_definition.
     TYPES: de_char150 TYPE c LENGTH 150 .
 
-    TYPES: t_log_stack TYPE TABLE OF REF TO ziot_cl_log_ewm WITH DEFAULT KEY .
+    TYPES: t_log_stack TYPE TABLE OF REF TO zial_cl_log_ewm WITH DEFAULT KEY .
 
     CONSTANTS: BEGIN OF mc_msg_content_type,
                  obj TYPE numc1 VALUE 1,
@@ -25,13 +25,13 @@ CLASS ziot_cl_log DEFINITION
                END OF mc_log_process .
 
     CONSTANTS: mc_msg_ident          TYPE c LENGTH 9 VALUE 'MSG_IDENT' ##NO_TEXT,
-               mc_dflt_log_object    TYPE balobj_d VALUE 'ZIOT_LOG' ##NO_TEXT, " Adjust to your needs
-               mc_log_subobject_log  TYPE balobj_d VALUE 'ZIOT_LOG' ##NO_TEXT,
-               mc_log_message_class  TYPE balobj_d VALUE 'ZIOT_LOG' ##NO_TEXT,
-               mc_log_context_struct TYPE baltabname VALUE 'ZIOT_S_LOG_CONTEXT' ##NO_TEXT.
+               mc_dflt_log_object    TYPE balobj_d VALUE 'ZIAL_LOG' ##NO_TEXT, " Adjust to your needs
+               mc_log_subobject_log  TYPE balobj_d VALUE 'ZIAL_LOG' ##NO_TEXT,
+               mc_log_message_class  TYPE balobj_d VALUE 'ZIAL_LOG' ##NO_TEXT,
+               mc_log_context_struct TYPE baltabname VALUE 'ZIAL_S_LOG_CONTEXT' ##NO_TEXT.
 
     CONSTANTS: BEGIN OF mc_msgde_callback,
-                 report  TYPE baluep VALUE 'ZIOT_R_BS_LOG_CALLBACK',
+                 report  TYPE baluep VALUE 'ZIAL_R_BS_LOG_CALLBACK',
                  routine TYPE baluef VALUE 'ON_CLICK_MSG_DETAIL',
                END OF mc_msgde_callback .
 
@@ -58,7 +58,7 @@ CLASS ziot_cl_log DEFINITION
                 mo_gui_alv_grid          TYPE REF TO cl_gui_alv_grid,
                 mv_sel_message_param_id  TYPE v_message_param_id.
 
-    CLASS-DATA: mo_instance  TYPE REF TO ziot_cl_log_ewm,
+    CLASS-DATA: mo_instance  TYPE REF TO zial_cl_log_ewm,
                 mt_log_stack TYPE t_log_stack .   " LIFO: Last log initiated is first to be saved
 
     "! Get existing or create and return new log instance
@@ -83,7 +83,7 @@ CLASS ziot_cl_log DEFINITION
         !iv_subobject      TYPE balsubobj
         !iv_extnumber      TYPE balnrext OPTIONAL
         !it_extnumber      TYPE stringtab OPTIONAL
-        !iv_callstack_lvl  TYPE numc1 DEFAULT ziot_cl_log=>mc_callstack_lvl-info
+        !iv_callstack_lvl  TYPE numc1 DEFAULT zial_cl_log=>mc_callstack_lvl-info
       RETURNING
         VALUE(ro_instance) LIKE mo_instance .
     "! Save log to application log and optionally close log instance
@@ -118,12 +118,12 @@ CLASS ziot_cl_log DEFINITION
     CLASS-METHODS to_msgde
       IMPORTING
         !it_fnam        TYPE string_table OPTIONAL
-        !is_msgde       TYPE ziot_cl_log=>s_input_parameters OPTIONAL
+        !is_msgde       TYPE zial_cl_log=>s_input_parameters OPTIONAL
         !is_data        TYPE data OPTIONAL
         !it_data        TYPE ANY TABLE OPTIONAL
         !iv_is_range    TYPE abap_bool DEFAULT abap_false
       RETURNING
-        VALUE(rt_msgde) TYPE ziot_cl_log=>t_input_parameters .
+        VALUE(rt_msgde) TYPE zial_cl_log=>t_input_parameters .
     "! Determine component names on base of input data
     "!
     "! @parameter it_input_data | Dynamic input data as table
@@ -132,7 +132,7 @@ CLASS ziot_cl_log DEFINITION
       IMPORTING
         !it_input_data       TYPE rsra_t_alert_definition
       RETURNING
-        VALUE(rv_components) TYPE ziot_cl_log=>de_char150 .
+        VALUE(rv_components) TYPE zial_cl_log=>de_char150 .
     "! Display message in application
     "!
     "! @parameter msgtx | Message text
@@ -145,7 +145,7 @@ CLASS ziot_cl_log DEFINITION
     CLASS-METHODS display_appl_msg
       IMPORTING
         !msgtx TYPE bapi_msg
-        !msgty TYPE msgty DEFAULT ziot_cl_log=>mc_log_type-success
+        !msgty TYPE msgty DEFAULT zial_cl_log=>mc_log_type-success
         !msgdt TYPE msgty OPTIONAL
         !msgv1 TYPE msgv1 OPTIONAL
         !msgv2 TYPE msgv2 OPTIONAL
@@ -159,13 +159,13 @@ CLASS ziot_cl_log DEFINITION
         is_data         TYPE any
         it_fnam         TYPE string_table
       RETURNING
-        VALUE(rt_msgde) TYPE ziot_cl_log=>t_input_parameters.
+        VALUE(rt_msgde) TYPE zial_cl_log=>t_input_parameters.
 
 ENDCLASS.
 
 
 
-CLASS ziot_cl_log IMPLEMENTATION.
+CLASS zial_cl_log IMPLEMENTATION.
 
 
   METHOD get.

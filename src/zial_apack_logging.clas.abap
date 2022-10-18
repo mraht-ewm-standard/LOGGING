@@ -1,4 +1,4 @@
-CLASS ziot_apack_logging DEFINITION
+CLASS zial_apack_logging DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
@@ -15,7 +15,7 @@ ENDCLASS.
 
 
 
-CLASS ziot_apack_logging IMPLEMENTATION.
+CLASS zial_apack_logging IMPLEMENTATION.
 
   METHOD constructor.
 
