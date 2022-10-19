@@ -56,7 +56,7 @@ CLASS zial_cl_log DEFINITION
 
     CLASS-DATA: mo_gui_docking_container TYPE REF TO cl_gui_docking_container,
                 mo_gui_alv_grid          TYPE REF TO cl_gui_alv_grid,
-                mv_sel_message_param_id  TYPE v_message_param_id.
+                mv_sel_msg_param_id      TYPE v_message_param_id.
 
     CLASS-DATA: mo_instance  TYPE REF TO zial_cl_log_ewm,
                 mt_log_stack TYPE t_log_stack .   " LIFO: Last log initiated is first to be saved
