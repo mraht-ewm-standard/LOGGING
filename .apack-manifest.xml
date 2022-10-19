@@ -4,7 +4,7 @@
   <DATA>
    <GROUP_ID>c-a-s.de</GROUP_ID>
    <ARTIFACT_ID>ewm-logging</ARTIFACT_ID>
-   <VERSION>10.10.2022.001-rc</VERSION>
+   <VERSION>17.10.2022.001-rc</VERSION>
    <REPOSITORY_TYPE>abapGit</REPOSITORY_TYPE>
    <GIT_URL>https://github.com/mraht-ewm-standard/LOGGING.git</GIT_URL>
   </DATA>
