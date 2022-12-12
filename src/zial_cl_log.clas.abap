@@ -10,7 +10,8 @@ CLASS zial_cl_log DEFINITION
            t_input_parameters TYPE rsra_t_alert_definition.
     TYPES: de_char150 TYPE c LENGTH 150 .
 
-    TYPES: t_log_stack TYPE TABLE OF REF TO zial_cl_log_ewm WITH DEFAULT KEY .
+    TYPES: o_log_instance TYPE REF TO zial_cl_log_ewm,
+           t_log_stack    TYPE TABLE OF o_log_instance WITH DEFAULT KEY.
 
     CONSTANTS: BEGIN OF mc_msg_content_type,
                  obj TYPE numc1 VALUE 1,
@@ -25,9 +26,8 @@ CLASS zial_cl_log DEFINITION
                END OF mc_log_process .
 
     CONSTANTS: mc_msg_ident          TYPE c LENGTH 9 VALUE 'MSG_IDENT' ##NO_TEXT,
-               mc_dflt_log_object    TYPE balobj_d VALUE 'ZIAL_LOG' ##NO_TEXT, " Adjust to your needs
+               mc_dflt_log_object    TYPE balobj_d VALUE '/SCWM/WME' ##NO_TEXT, " Adjust to your needs
                mc_log_subobject_log  TYPE balobj_d VALUE 'ZIAL_LOG' ##NO_TEXT,
-               mc_log_message_class  TYPE balobj_d VALUE 'ZIAL_LOG' ##NO_TEXT,
                mc_log_context_struct TYPE baltabname VALUE 'ZIAL_S_LOG_CONTEXT' ##NO_TEXT.
 
     CONSTANTS: BEGIN OF mc_msgde_callback,
@@ -58,7 +58,7 @@ CLASS zial_cl_log DEFINITION
                 mo_gui_alv_grid          TYPE REF TO cl_gui_alv_grid,
                 mv_sel_msg_param_id      TYPE v_message_param_id.
 
-    CLASS-DATA: mo_instance  TYPE REF TO zial_cl_log_ewm,
+    CLASS-DATA: mo_instance  TYPE o_log_instance,
                 mt_log_stack TYPE t_log_stack .   " LIFO: Last log initiated is first to be saved
 
     "! Get existing or create and return new log instance
@@ -79,7 +79,7 @@ CLASS zial_cl_log DEFINITION
       IMPORTING
         !iv_lgnum          TYPE /scwm/lgnum OPTIONAL
         !io_sap_log        TYPE REF TO /scwm/cl_log OPTIONAL
-        !iv_object         TYPE balobj_d DEFAULT '/SCWM/WME'
+        !iv_object         TYPE balobj_d DEFAULT mc_dflt_log_object
         !iv_subobject      TYPE balsubobj
         !iv_extnumber      TYPE balnrext OPTIONAL
         !it_extnumber      TYPE stringtab OPTIONAL
@@ -151,6 +151,16 @@ CLASS zial_cl_log DEFINITION
         !msgv2 TYPE msgv2 OPTIONAL
         !msgv3 TYPE msgv3 OPTIONAL
         !msgv4 TYPE msgv4 OPTIONAL .
+    CLASS-METHODS to_textid
+      IMPORTING
+        !iv_msgid         TYPE symsgid OPTIONAL
+        !iv_msgno         TYPE symsgno OPTIONAL
+        !iv_msgv1         TYPE symsgv OPTIONAL
+        !iv_msgv2         TYPE symsgv OPTIONAL
+        !iv_msgv3         TYPE symsgv OPTIONAL
+        !iv_msgv4         TYPE symsgv OPTIONAL
+      RETURNING
+        VALUE(rs_t100key) TYPE scx_t100key.
 
   PRIVATE SECTION.
     CLASS-METHODS to_msgde_add_by_components
@@ -174,7 +184,7 @@ CLASS zial_cl_log IMPLEMENTATION.
     IF mo_instance IS INITIAL.
       mo_instance = NEW #( iv_object    = mc_dflt_log_object
                            iv_subobject = mc_log_subobject_log
-                           iv_extnumber = TEXT-001 ).
+                           iv_extnumber = CONV #( TEXT-001 ) ).
       APPEND mo_instance TO mt_log_stack.
     ENDIF.
 
@@ -204,7 +214,7 @@ CLASS zial_cl_log IMPLEMENTATION.
              v4 TYPE symsgv,
            END OF s_msgvar.
 
-    CHECK iv_msgty   NA 'SEWIA'
+    CHECK iv_msgty NA 'SEWIA'
       AND (    iv_symsg EQ abap_true
             OR iv_msgid IS NOT INITIAL
             OR iv_msgtx IS NOT INITIAL ).
@@ -430,4 +440,30 @@ CLASS zial_cl_log IMPLEMENTATION.
     ENDLOOP.
 
   ENDMETHOD.
+
+
+  METHOD to_textid.
+
+    IF iv_msgid IS INITIAL.
+
+      rs_t100key = VALUE #( msgid = sy-msgid
+                            msgno = sy-msgno
+                            attr1 = sy-msgv1
+                            attr2 = sy-msgv2
+                            attr3 = sy-msgv3
+                            attr4 = sy-msgv4 ).
+
+    ELSE.
+
+      rs_t100key = VALUE #( msgid = sy-msgid
+                            msgno = sy-msgno
+                            attr1 = sy-msgv1
+                            attr2 = sy-msgv2
+                            attr3 = sy-msgv3
+                            attr4 = sy-msgv4 ).
+
+    ENDIF.
+
+  ENDMETHOD.
+
 ENDCLASS.
