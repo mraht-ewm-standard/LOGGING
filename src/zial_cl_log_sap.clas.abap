@@ -170,7 +170,7 @@ CLASS zial_cl_log_sap DEFINITION
           mv_log_counter  TYPE i.
 
     DATA: mv_msg_param_id     TYPE zial_cl_log=>v_message_param_id,
-          mt_msg_detail       TYPE /scwm/tt_msg_details,
+          mt_msg_detail       TYPE zial_tt_msg_details,
           mt_msg_detail_input TYPE zial_cl_log=>t_input_parameters.
 
     CLASS-METHODS error_handling
@@ -403,7 +403,7 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
     CASE sy-subrc.
       WHEN 0.
-        me->mv_log_counter += 1.
+        ADD 1 TO me->mv_log_counter.
 
         DATA(ls_bapiret2) = CORRESPONDING bapiret2( ls_msg MAPPING id         = msgid
                                                                    type       = msgty
@@ -1004,18 +1004,15 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
   METHOD save_msgde.
 
     CHECK it_new_lognumbers IS NOT INITIAL.
+
     ASSIGN it_new_lognumbers[ lines( it_new_lognumbers ) ] TO FIELD-SYMBOL(<ls_new_lognumber>).
-    IF    me->mt_msg_detail    IS NOT INITIAL
+    CHECK me->mt_msg_detail  IS NOT INITIAL
       AND <ls_new_lognumber> IS ASSIGNED.
 
-      CALL FUNCTION '/SCWM/DLV_EXPORT_LOG'
-        EXPORTING
-          iv_lognumber   = <ls_new_lognumber>-lognumber
-          it_msg_details = me->mt_msg_detail.
+    " EWM: /SCWM/DLV_EXPORT_LOG
+    EXPORT mt_msg_detail FROM me->mt_msg_detail TO DATABASE bal_indx(al) ID <ls_new_lognumber>-lognumber.
 
-      CLEAR: me->mt_msg_detail.
-
-    ENDIF.
+    CLEAR: me->mt_msg_detail.
 
   ENDMETHOD.
 
