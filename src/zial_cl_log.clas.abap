@@ -9,7 +9,7 @@ CLASS zial_cl_log DEFINITION
            t_input_parameters TYPE rsra_t_alert_definition.
     TYPES: de_char150 TYPE c LENGTH 150 .
 
-    TYPES: o_log_instance TYPE REF TO zial_cl_log_sap,
+    TYPES: o_log_instance TYPE REF TO zial_cl_log_ewm,
            t_log_stack    TYPE TABLE OF o_log_instance WITH DEFAULT KEY.
 
     CONSTANTS: BEGIN OF mc_msg_content_type,
@@ -164,6 +164,7 @@ CLASS zial_cl_log DEFINITION
       RETURNING
         VALUE(rv_result) TYPE string.
 
+protected section.
   PRIVATE SECTION.
     CLASS-METHODS to_msgde_add_by_components
       IMPORTING
@@ -177,7 +178,35 @@ ENDCLASS.
 
 
 
-CLASS zial_cl_log IMPLEMENTATION.
+CLASS ZIAL_CL_LOG IMPLEMENTATION.
+
+
+  METHOD display_as_message.
+
+    DATA(lv_msgtx) = msgtx.
+
+    DATA(lv_msgdt) = msgdt.
+    IF msgdt CO ' _0'.
+      lv_msgdt = msgty.
+    ENDIF.
+
+    REPLACE: '&1' WITH msgv1 INTO lv_msgtx,
+             '&2' WITH msgv2 INTO lv_msgtx,
+             '&3' WITH msgv3 INTO lv_msgtx,
+             '&4' WITH msgv4 INTO lv_msgtx.
+    MESSAGE lv_msgtx TYPE msgty DISPLAY LIKE lv_msgdt.
+
+  ENDMETHOD.
+
+
+  METHOD display_as_popup.
+
+    DATA(lt_bapiret) = it_bapiret.
+    CALL FUNCTION 'RSCRMBW_DISPLAY_BAPIRET2'
+      TABLES
+        it_return = lt_bapiret.
+
+  ENDMETHOD.
 
 
   METHOD get.
@@ -191,6 +220,40 @@ CLASS zial_cl_log IMPLEMENTATION.
     ENDIF.
 
     ro_instance = mo_instance.
+
+  ENDMETHOD.
+
+
+  METHOD get_components_from_msgde.
+
+    LOOP AT it_input_data ASSIGNING FIELD-SYMBOL(<ls_input_data>).
+
+      CASE sy-tabix.
+        WHEN 1.
+          rv_components = <ls_input_data>-fnam.
+
+        WHEN OTHERS.
+          rv_components = |{ rv_components }, { <ls_input_data>-fnam }|.
+
+      ENDCASE.
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
+  METHOD init.
+
+    mo_instance = NEW #( iv_object        = iv_object
+                         iv_subobject     = iv_subobject
+                         iv_extnumber     = iv_extnumber
+                         it_extnumber     = it_extnumber
+                         iv_callstack_lvl = iv_callstack_lvl ).
+
+    mo_instance->init( iv_extnumber = iv_extnumber
+                       it_extnumber = it_extnumber ).
+
+    APPEND mo_instance TO mt_log_stack.
 
   ENDMETHOD.
 
@@ -284,68 +347,6 @@ CLASS zial_cl_log IMPLEMENTATION.
         par4   = rs_bapiret-message_v4
       IMPORTING
         return = rs_bapiret.
-
-  ENDMETHOD.
-
-
-  METHOD init.
-
-    mo_instance = NEW #( iv_object        = iv_object
-                         iv_subobject     = iv_subobject
-                         iv_extnumber     = iv_extnumber
-                         it_extnumber     = it_extnumber
-                         iv_callstack_lvl = iv_callstack_lvl ).
-
-    mo_instance->init( iv_extnumber = iv_extnumber
-                       it_extnumber = it_extnumber ).
-
-    APPEND mo_instance TO mt_log_stack.
-
-  ENDMETHOD.
-
-
-  METHOD display_as_message.
-
-    DATA(lv_msgtx) = msgtx.
-
-    DATA(lv_msgdt) = msgdt.
-    IF msgdt CO ' _0'.
-      lv_msgdt = msgty.
-    ENDIF.
-
-    REPLACE: '&1' WITH msgv1 INTO lv_msgtx,
-             '&2' WITH msgv2 INTO lv_msgtx,
-             '&3' WITH msgv3 INTO lv_msgtx,
-             '&4' WITH msgv4 INTO lv_msgtx.
-    MESSAGE lv_msgtx TYPE msgty DISPLAY LIKE lv_msgdt.
-
-  ENDMETHOD.
-
-
-  METHOD display_as_popup.
-
-    DATA(lt_bapiret) = it_bapiret.
-    CALL FUNCTION 'RSCRMBW_DISPLAY_BAPIRET2'
-      TABLES
-        it_return = lt_bapiret.
-
-  ENDMETHOD.
-
-
-  METHOD get_components_from_msgde.
-
-    LOOP AT it_input_data ASSIGNING FIELD-SYMBOL(<ls_input_data>).
-
-      CASE sy-tabix.
-        WHEN 1.
-          rv_components = <ls_input_data>-fnam.
-
-        WHEN OTHERS.
-          rv_components = |{ rv_components }, { <ls_input_data>-fnam }|.
-
-      ENDCASE.
-
-    ENDLOOP.
 
   ENDMETHOD.
 
@@ -471,5 +472,4 @@ CLASS zial_cl_log IMPLEMENTATION.
       INTO rv_result.
 
   ENDMETHOD.
-
 ENDCLASS.
