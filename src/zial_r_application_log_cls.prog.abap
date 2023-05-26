@@ -86,11 +86,16 @@ CLASS lcl_application DEFINITION FINAL.
     CLASS-METHODS build_display_profile
       RETURNING
         VALUE(rs_display_profile) TYPE bal_s_prof.
-    CLASS-METHODS show_appl_log.
+    CLASS-METHODS show_appl_log
+      RAISING
+        lcx_error.
     CLASS-METHODS exp_excel.
     CLASS-METHODS sel_appl_log
-      RETURNING
-        VALUE(rt_messages) TYPE zial_tt_balm
+      IMPORTING
+        iv_sel_to_show TYPE abap_bool DEFAULT abap_true
+      EXPORTING
+        et_header_data TYPE zial_tt_balhdr
+        et_messages    TYPE zial_tt_balm
       RAISING
         lcx_error.
     CLASS-METHODS export_to_excel
@@ -264,118 +269,20 @@ CLASS lcl_application IMPLEMENTATION.
 
   METHOD show_appl_log.
 
-    DATA(lv_probclass) = '1'.
-    CASE abap_true.
-      WHEN p_class2.
-        lv_probclass = '2'.
-
-      WHEN p_class3.
-        lv_probclass = '3'.
-
-      WHEN p_class4.
-        lv_probclass = '4'.
-
-    ENDCASE.
-
-    DATA(ls_log_filter) = VALUE bal_s_lfil( ).
-    CALL FUNCTION 'BAL_FILTER_CREATE'
-      EXPORTING
-        i_object       = p_obj
-        i_subobject    = p_subobj
-        i_extnumber    = p_extnum
-        i_aldate_from  = p_datfr
-        i_aldate_to    = p_datto
-        i_altime_from  = p_timfr
-        i_altime_to    = p_timto
-        i_probclass_to = lv_probclass
-        i_alprog       = p_prog
-        i_altcode      = p_tcode
-        i_aluser       = p_user
+    sel_appl_log(
       IMPORTING
-        e_s_log_filter = ls_log_filter
-      EXCEPTIONS
-        OTHERS         = 0.
-
-    DATA(lt_log_header) = VALUE balhdr_t( ).
-    CALL FUNCTION 'BAL_DB_SEARCH'
-      EXPORTING
-        i_s_log_filter = ls_log_filter
-      IMPORTING
-        e_t_log_header = lt_log_header
-      EXCEPTIONS
-        OTHERS         = 1.
-
-    CHECK sy-subrc EQ 0.
-
-    DATA(lt_log_handle_loaded) = VALUE bal_t_logh( ).
-    CALL FUNCTION 'BAL_DB_LOAD'
-      EXPORTING
-        i_t_log_header = lt_log_header
-      IMPORTING
-        e_t_log_handle = lt_log_handle_loaded
-      EXCEPTIONS
-        OTHERS         = 0.
-
-    DATA(lt_r_lognumber) = CONV rseloption( s_lognum[] ).
-
-    CASE p_appl.
-      WHEN abap_true.
-        FIELD-SYMBOLS: <ls_log_data> TYPE bal_s_gdat,
-                       <gt_messages> TYPE ANY TABLE.
-
-        ASSIGN ('(SAPLSBAL)G') TO <ls_log_data>.
-
-        DATA(lt_log_handle) = VALUE bal_t_logh( ).
-        LOOP AT lt_log_handle_loaded ASSIGNING FIELD-SYMBOL(<lv_log_handle_loaded>).
-
-          READ TABLE <ls_log_data>-t_ldat ASSIGNING FIELD-SYMBOL(<ls_ldat>)
-              WITH KEY log_handle = <lv_log_handle_loaded>.
-          CHECK <ls_ldat> IS ASSIGNED
-            AND <ls_ldat>-admin-lognumber IN lt_r_lognumber.
-
-          LOOP AT <ls_ldat>-messages-t_mhdr ASSIGNING FIELD-SYMBOL(<ls_mhdr>) GROUP BY <ls_mhdr>-category.
-
-            ASSIGN COMPONENT 'CATEGORY-VAR' OF STRUCTURE <ls_mhdr> TO FIELD-SYMBOL(<gv_var>).
-            ASSIGN COMPONENT 'CATEGORY-CON' OF STRUCTURE <ls_mhdr> TO FIELD-SYMBOL(<gv_con>).
-            ASSIGN COMPONENT 'CATEGORY-SRC' OF STRUCTURE <ls_mhdr> TO FIELD-SYMBOL(<gv_src>).
-            ASSIGN COMPONENT 'CATEGORY-PAR' OF STRUCTURE <ls_mhdr> TO FIELD-SYMBOL(<gv_par>).
-            DATA(lv_table_name) = CONV fieldname( 'MESSAGES-T_' && <gv_var> && <gv_con> && <gv_src> && <gv_par> ).
-            ASSIGN COMPONENT lv_table_name OF STRUCTURE <ls_ldat> TO <gt_messages>.
-
-            LOOP AT <gt_messages> ASSIGNING FIELD-SYMBOL(<gs_messages>).
-
-              DATA(lv_has_valid_msg) = is_valid_msg( <gs_messages> ).
-              IF lv_has_valid_msg EQ abap_true.
-                EXIT.
-              ENDIF.
-
-            ENDLOOP.
-
-            IF lv_has_valid_msg EQ abap_true.
-              EXIT.
-            ENDIF.
-
-          ENDLOOP.
-
-          IF lv_has_valid_msg EQ abap_true.
-            INSERT <lv_log_handle_loaded> INTO TABLE lt_log_handle.
-          ENDIF.
-
-        ENDLOOP.
-
-        IF lt_log_handle IS INITIAL.
-          MESSAGE i368(00) WITH TEXT-008.
-          RETURN.
-        ENDIF.
-
-      WHEN abap_false.
-        DATA(ls_msg_filter) = VALUE bal_s_mfil( msgid = s_msgid[]
-                                                msgno = s_msgno[]
-                                                msgty = s_msgty[] ).
-
-    ENDCASE.
+        et_header_data = DATA(lt_header_data)
+        et_messages    = DATA(lt_messages) ).
 
     DATA(ls_profile) = build_display_profile( ).
+    DATA(lt_log_handle) = VALUE bal_t_logh( FOR <s_header_data> IN lt_header_data
+                                              ( <s_header_data>-log_handle ) ).
+
+    IF p_appl EQ abap_false.
+      DATA(ls_msg_filter) = VALUE bal_s_mfil( msgid = s_msgid[]
+                                              msgno = s_msgno[]
+                                              msgty = s_msgty[] ).
+    ENDIF.
 
     CALL FUNCTION 'BAL_DSP_LOG_DISPLAY'
       EXPORTING
@@ -397,7 +304,11 @@ CLASS lcl_application IMPLEMENTATION.
   METHOD exp_excel.
 
     TRY.
-        DATA(lt_messages) = sel_appl_log( ).
+        sel_appl_log(
+          EXPORTING
+            iv_sel_to_show = abap_false
+          IMPORTING
+            et_messages = DATA(lt_messages) ).
 
         filter_messages(
           CHANGING
@@ -429,6 +340,12 @@ CLASS lcl_application IMPLEMENTATION.
 
     ENDCASE.
 
+    " Buffer for log display
+    IF iv_sel_to_show EQ abap_true.
+      DATA(lv_put_into_memory) = abap_true.
+    ENDIF.
+
+    DATA(lt_header_data) = VALUE zial_tt_balhdr( ).
     CALL FUNCTION 'APPL_LOG_READ_DB'
       EXPORTING
         object           = p_obj
@@ -442,10 +359,12 @@ CLASS lcl_application IMPLEMENTATION.
         program_name     = p_prog
         transaction_code = p_tcode
         user_id          = p_user
+        put_into_memory  = lv_put_into_memory
       TABLES
-        messages         = rt_messages.
+        header_data      = et_header_data
+        messages         = et_messages.
 
-    IF rt_messages IS INITIAL.
+    IF et_messages IS INITIAL.
       MESSAGE w001(00) WITH TEXT-901 INTO DATA(lv_msg).
       RAISE EXCEPTION TYPE lcx_error
         MESSAGE ID sy-msgid NUMBER sy-msgno
