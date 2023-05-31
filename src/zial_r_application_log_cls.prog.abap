@@ -198,6 +198,8 @@ CLASS lcl_application IMPLEMENTATION.
         rv_result = abap_true.
       ENDIF.
 
+      UNASSIGN: <lv_value>.
+
     ENDDO.
 
   ENDMETHOD.
