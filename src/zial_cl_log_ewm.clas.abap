@@ -38,15 +38,7 @@ CLASS zial_cl_log_ewm DEFINITION
         !io_dm_message TYPE REF TO /scwm/cl_dm_message_no OPTIONAL
         !it_dm_message TYPE /scdl/dm_message_tab.
 
-
-
-
   PROTECTED SECTION.
-    CONSTANTS: class_name TYPE classname VALUE 'ZIAL_CL_LOG'.
-
-    CONSTANTS: message_text_id TYPE symsgid VALUE 'BL' ##NO_TEXT,
-               message_text_no TYPE symsgno VALUE '001' ##NO_TEXT.
-
     CLASS-DATA: mo_instance   TYPE REF TO zial_cl_log_ewm,
                 mv_has_error  TYPE abap_bool,
                 mv_save_error TYPE abap_bool.
@@ -69,15 +61,12 @@ CLASS zial_cl_log_ewm DEFINITION
 
     DATA message_detail TYPE /scwm/tt_msg_details.
 
-
     METHODS handle_error REDEFINITION.
 
     METHODS build_validity REDEFINITION.
 
     METHODS add_msg_by_message_object REDEFINITION.
     METHODS add_msg_by_message_text REDEFINITION.
-
-  PRIVATE SECTION.
 
 ENDCLASS.
 
@@ -189,8 +178,8 @@ CLASS zial_cl_log_ewm IMPLEMENTATION.
     save( ).
 
     DATA(lo_log_sap) = NEW zial_cl_log_ewm( iv_lgnum       = me->mv_lgnum
-                                            iv_object      = zial_cl_log=>mc_dflt_log_object
-                                            iv_subobject   = zial_cl_log=>mc_log_subobject_log
+                                            iv_object      = zial_cl_log=>mc_default-log_object
+                                            iv_subobject   = zial_cl_log=>mc_default-log_subobject
                                             iv_extnumber   = TEXT-000 ).
 
     DATA(lt_bapiret) = error_handling( iv_process   = iv_process
