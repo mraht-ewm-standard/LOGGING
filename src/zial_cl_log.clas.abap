@@ -168,7 +168,6 @@ CLASS zial_cl_log DEFINITION
       RETURNING
         VALUE(rv_result) TYPE string.
 
-  PROTECTED SECTION.
   PRIVATE SECTION.
     CLASS-METHODS to_msgde_add_by_components
       IMPORTING
@@ -182,7 +181,7 @@ ENDCLASS.
 
 
 
-CLASS zial_cl_log IMPLEMENTATION.
+CLASS ZIAL_CL_LOG IMPLEMENTATION.
 
 
   METHOD display_as_message.
@@ -462,8 +461,8 @@ CLASS zial_cl_log IMPLEMENTATION.
 
     DATA(ls_bapiret) = is_bapiret.
 
-    IF  ls_bapiret-id     IS INITIAL
-     OR ls_bapiret-number IS INITIAL.
+    IF   ls_bapiret-id     IS INITIAL
+      OR ls_bapiret-number IS INITIAL.
       ls_bapiret-id     = mc_default-msgid.
       ls_bapiret-number = mc_default-msgno.
     ENDIF.
@@ -477,5 +476,4 @@ CLASS zial_cl_log IMPLEMENTATION.
       INTO rv_result.
 
   ENDMETHOD.
-
 ENDCLASS.
