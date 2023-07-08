@@ -1,7 +1,7 @@
 "! <p class="shorttext synchronized" lang="en">Logging</p>
 CLASS zial_cl_log DEFINITION
   PUBLIC
-  CREATE PRIVATE .
+  CREATE PRIVATE.
 
   PUBLIC SECTION.
     TYPES: v_message_param_id TYPE n LENGTH 10 .
