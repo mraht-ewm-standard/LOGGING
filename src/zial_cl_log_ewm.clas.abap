@@ -37,6 +37,12 @@ CLASS zial_cl_log_ewm DEFINITION
       IMPORTING
         !io_dm_message TYPE REF TO /scwm/cl_dm_message_no OPTIONAL
         !it_dm_message TYPE /scdl/dm_message_tab.
+    "! Set warehouse number
+    "!
+    "! @parameter iv_lgnum | Warehouse number
+    METHODS set_lgnum
+      IMPORTING
+        iv_lgnum TYPE /scwm/lgnum.
 
   PROTECTED SECTION.
     CLASS-DATA: mo_instance   TYPE REF TO zial_cl_log_ewm,
@@ -221,6 +227,13 @@ CLASS zial_cl_log_ewm IMPLEMENTATION.
 
     me->det_caller( ).
     me->log_caller( ).
+
+  ENDMETHOD.
+
+
+  METHOD set_lgnum.
+
+    me->mv_lgnum   = iv_lgnum.
 
   ENDMETHOD.
 
