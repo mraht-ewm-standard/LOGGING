@@ -31,8 +31,8 @@ CLASS lcl_application DEFINITION FINAL.
       RETURNING
         VALUE(rs_display_profile) TYPE bal_s_prof.
     CLASS-METHODS show_appl_log
-                    RAISING
-                      zcx_error.
+      RAISING
+        zcx_error.
     CLASS-METHODS exp_excel.
     CLASS-METHODS sel_appl_log
       IMPORTING
@@ -386,10 +386,8 @@ CLASS lcl_application IMPLEMENTATION.
         MESSAGE ID sy-msgid NUMBER sy-msgno
         WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
     ELSEIF lv_user_action EQ cl_gui_frontend_services=>action_cancel.
-      MESSAGE w001(00) WITH TEXT-900 INTO DATA(lv_msg).
       RAISE EXCEPTION TYPE zcx_error
-        MESSAGE ID sy-msgid NUMBER sy-msgno
-        WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+        MESSAGE w001(00) WITH TEXT-900.
     ENDIF.
 
     DATA(lt_data_tab) = VALUE t_data_tab( ).
