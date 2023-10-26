@@ -11,7 +11,7 @@ CLASS zial_cl_log_ewm DEFINITION
         !iv_lgnum         TYPE /scwm/lgnum OPTIONAL
         !io_sap_log       TYPE REF TO /scwm/cl_log OPTIONAL
         !iv_object        TYPE balobj_d DEFAULT '/SCWM/WME'
-        !iv_subobject     TYPE balsubobj
+        !iv_subobject     TYPE balsubobj DEFAULT 'LOG_GENERAL'
         !iv_extnumber     TYPE balnrext OPTIONAL
         !it_extnumber     TYPE stringtab OPTIONAL
         !iv_callstack_lvl TYPE numc1 DEFAULT zial_cl_log=>mc_callstack_lvl-info.
@@ -217,16 +217,6 @@ CLASS zial_cl_log_ewm IMPLEMENTATION.
 
     me->mv_lgnum   = iv_lgnum.
     me->mo_sap_log = io_sap_log.
-
-    me->build_extnumber( iv_extnumber = iv_extnumber
-                         it_extnumber = it_extnumber ).
-
-    me->build_validity( ).
-
-    me->create_log( ).
-
-    me->det_caller( ).
-    me->log_caller( ).
 
   ENDMETHOD.
 
