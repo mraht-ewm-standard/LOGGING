@@ -28,11 +28,7 @@ FORM on_click_msg_detail TABLES i_params STRUCTURE spar.
 
   " Load specific message details from database
   DATA(lt_msg_details) = VALUE /scwm/tt_msg_details( ).
-  CALL FUNCTION '/SCWM/DLV_IMPORT_LOG'
-    EXPORTING
-      iv_lognumber   = lv_log_number
-    IMPORTING
-      et_msg_details = lt_msg_details. "#EC EXISTS
+  IMPORT msg_details TO lt_msg_details FROM DATABASE bal_indx(al) ID lv_log_number.
 
   CHECK lt_msg_details IS NOT INITIAL.
 
