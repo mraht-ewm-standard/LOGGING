@@ -91,7 +91,7 @@ CLASS lcl_application IMPLEMENTATION.
 
         ENDCASE.
 
-      CATCH zcx_root INTO DATA(lx_error).
+      CATCH zcx_static_check INTO DATA(lx_error).
         MESSAGE lx_error->get_text( ) TYPE 'E'.
 
     ENDTRY.

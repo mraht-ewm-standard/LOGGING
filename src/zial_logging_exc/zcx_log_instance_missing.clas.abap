@@ -14,7 +14,7 @@ CLASS zcx_log_instance_missing DEFINITION
         log_enabled TYPE abap_bool.
 
   PROTECTED SECTION.
-    CLASS-DATA log_class_enabled TYPE cx_bool VALUE zcx_root=>undef.
+    CLASS-DATA log_class_enabled TYPE cx_bool VALUE undef.
 
     METHODS log_input REDEFINITION.
 
@@ -35,7 +35,7 @@ CLASS zcx_log_instance_missing IMPLEMENTATION.
 
 
   METHOD enable_log_class.
-    log_class_enabled = zcx_root=>det_bool( log_enabled ).
+    log_class_enabled = det_bool( log_enabled ).
   ENDMETHOD.
 
 
