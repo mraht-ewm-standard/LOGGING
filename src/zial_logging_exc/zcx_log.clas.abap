@@ -1,4 +1,4 @@
-"! <p class="shorttext synchronized" lang="en">Log-specific exception</p>
+"! <p class="shorttext synchronized" lang="en">{@link ZIAL_CL_LOG}: Exceptions</p>
 CLASS zcx_log DEFINITION
   PUBLIC
   INHERITING FROM zcx_static_check
@@ -6,28 +6,23 @@ CLASS zcx_log DEFINITION
   ABSTRACT.
 
   PUBLIC SECTION.
-    CLASS-METHODS enable_log_parent
-      IMPORTING
-        iv_log_enabled TYPE abap_bool.
-    CLASS-METHODS is_log_parent_enabled
-      RETURNING
-        VALUE(rv_log_enabled) TYPE cx_bool.
+    INTERFACES: zif_cx_group.
 
   PROTECTED SECTION.
-    CLASS-DATA log_parent_enabled TYPE cx_bool VALUE mc_log_enabled-undef.
+    CLASS-DATA log_group_enabled TYPE cx_bool VALUE mc_log_enabled-undef.
 
 ENDCLASS.
 
 
 CLASS zcx_log IMPLEMENTATION.
 
-  METHOD enable_log_parent.
-    log_parent_enabled = det_bool( iv_log_enabled ).
+  METHOD zif_cx_group~enable_log.
+    log_group_enabled = det_bool( iv_enable ).
   ENDMETHOD.
 
 
-  METHOD is_log_parent_enabled.
-    rv_log_enabled = log_parent_enabled.
+  METHOD zif_cx_group~is_log_enabled.
+    rv_is_enabled = log_group_enabled.
   ENDMETHOD.
 
 ENDCLASS.
