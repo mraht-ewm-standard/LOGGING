@@ -228,6 +228,8 @@ CLASS zial_cl_log IMPLEMENTATION.
 
     APPEND mo_instance TO mt_log_stack.
 
+    ro_instance = mo_instance.
+
   ENDMETHOD.
 
 
