@@ -31,11 +31,9 @@ CLASS zial_cl_log_ewm DEFINITION
         !io_api_message TYPE REF TO /scwm/if_api_message.
     "! Log delivery management messages
     "!
-    "! @parameter io_dm_message | Delivery management log object
     "! @parameter it_dm_message | Delivery management log messages
     METHODS log_dm_message
       IMPORTING
-        !io_dm_message TYPE REF TO /scwm/cl_dm_message_no OPTIONAL
         !it_dm_message TYPE /scdl/dm_message_tab.
     "! Set warehouse number
     "!
@@ -241,21 +239,7 @@ CLASS zial_cl_log_ewm IMPLEMENTATION.
 
   METHOD log_dm_message.
 
-    IF io_dm_message IS BOUND.
-
-      DATA(lt_dm_message) = io_dm_message->get_messages( ).
-
-    ELSEIF it_dm_message IS NOT INITIAL.
-
-      lt_dm_message = it_dm_message.
-
-    ELSE.
-
-      RETURN.
-
-    ENDIF.
-
-    LOOP AT lt_dm_message ASSIGNING FIELD-SYMBOL(<ls_dm_message>).
+    LOOP AT it_dm_message ASSIGNING FIELD-SYMBOL(<ls_dm_message>).
       me->log_sy_message( is_symsg = CORRESPONDING #( <ls_dm_message> ) ).
     ENDLOOP.
 
