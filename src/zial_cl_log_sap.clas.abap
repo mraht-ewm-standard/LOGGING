@@ -1030,10 +1030,7 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
       DO 4 TIMES.
 
-        DATA lv_msg_var TYPE string.
-
-        CLEAR lv_msg_var.
-
+        DATA(lv_msg_var) = VALUE string( ).
         CASE sy-index.
           WHEN 1.
             lv_msg_var = iv_msgv1.
