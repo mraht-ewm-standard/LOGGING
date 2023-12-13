@@ -16,7 +16,8 @@ CLASS ltc_log IMPLEMENTATION.
                          iv_subobject = 'MFS'
                          iv_extnumber = |AbapUnitTest: LCL_LOG| ).
 
-    zial_cl_log=>get( )->success( iv_msgtx = |A success message| ).
+    MESSAGE s002(sy) WITH |A success message| INTO DATA(lv_msg).
+    zial_cl_log=>get( )->log_message( VALUE #( ( fnam = 'HUIDENT' low = '123456' ) ) ).
 
     zial_cl_log=>save( ).
 

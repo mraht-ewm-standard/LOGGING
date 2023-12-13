@@ -107,9 +107,9 @@ CLASS lcl_application IMPLEMENTATION.
 
   METHOD has_valid_obligatory_attr.
 
-    DO 3 TIMES.
+    FIELD-SYMBOLS <lt_r_msg_attr> TYPE ANY TABLE.
 
-      FIELD-SYMBOLS <lt_r_msg_attr> TYPE ANY TABLE.
+    DO 3 TIMES.
 
       DATA(lv_index) = sy-index.
       CASE lv_index.
@@ -339,7 +339,8 @@ CLASS lcl_application IMPLEMENTATION.
     CONSTANTS lc_export_format TYPE string VALUE 'xlsx'.
 
     DATA(lv_default_file_name) = |ApplLog_{ sy-datlo }_{ sy-timlo }|.
-    DATA(lv_file_filter) = |{ TEXT-009 } (*.{ lc_export_format })\|*.{ lc_export_format }\|{ cl_gui_frontend_services=>filetype_all }|.
+    DATA(lv_file_filter) = |{ TEXT-009 } (*.{ lc_export_format })\|*.{ lc_export_format }| &&
+                           |\|{ cl_gui_frontend_services=>filetype_all }|.
 
     DATA(lv_filename)    = VALUE string( ).
     DATA(lv_path)        = VALUE string( ).
@@ -360,7 +361,7 @@ CLASS lcl_application IMPLEMENTATION.
                                                            invalid_default_file_name = 4
                                                            OTHERS                    = 5 ).
 
-    IF sy-subrc <> 0.
+    IF sy-subrc NE 0.
       RAISE EXCEPTION TYPE zcx_error
         MESSAGE ID sy-msgid NUMBER sy-msgno
         WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
@@ -426,7 +427,7 @@ CLASS lcl_application IMPLEMENTATION.
                                                        error_no_gui            = 23
                                                        OTHERS                  = 24 ).
 
-    IF sy-subrc <> 0.
+    IF sy-subrc NE 0.
       RAISE EXCEPTION TYPE zcx_error
         MESSAGE ID sy-msgid NUMBER sy-msgno
         WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
