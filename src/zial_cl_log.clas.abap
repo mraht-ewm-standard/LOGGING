@@ -7,8 +7,8 @@ CLASS zial_cl_log DEFINITION
     TYPES v_message_param_id TYPE n LENGTH 10.
     TYPES v_input_component  TYPE c LENGTH 150.
 
-    TYPES o_log_instance     TYPE REF TO zial_cl_log_ewm.
-    TYPES t_log_stack        TYPE TABLE OF o_log_instance WITH DEFAULT KEY.
+    TYPES r_log_instance     TYPE REF TO zial_cl_log_ewm.
+    TYPES t_log_stack        TYPE TABLE OF r_log_instance WITH DEFAULT KEY.
 
     CONSTANTS: BEGIN OF mc_msg_content_type,
                  obj TYPE numc1 VALUE 1,
@@ -60,7 +60,7 @@ CLASS zial_cl_log DEFINITION
     CLASS-DATA mo_gui_alv_grid          TYPE REF TO cl_gui_alv_grid.
     CLASS-DATA mv_sel_msg_param_id      TYPE v_message_param_id.
 
-    CLASS-DATA mo_instance              TYPE o_log_instance.
+    CLASS-DATA mo_instance              TYPE r_log_instance.
     CLASS-DATA mt_log_stack             TYPE t_log_stack. " LIFO: Last log initiated is first to be saved
 
     "! Get existing or create and return new log instance
@@ -332,7 +332,6 @@ CLASS zial_cl_log IMPLEMENTATION.
   METHOD to_msgde.
 
     DATA lo_struct_descr TYPE REF TO cl_abap_structdescr.
-    DATA lo_table_descr  TYPE REF TO cl_abap_tabledescr.
 
     IF is_msgde IS NOT INITIAL.
 
@@ -351,6 +350,8 @@ CLASS zial_cl_log IMPLEMENTATION.
                                              it_fnam         = it_fnam ).
 
     ELSEIF it_data IS NOT INITIAL.
+
+      DATA lo_table_descr TYPE REF TO cl_abap_tabledescr.
 
       lo_table_descr ?= cl_abap_typedescr=>describe_by_data( it_data ).
       DATA(lo_data_descr) = lo_table_descr->get_table_line_type( ).
@@ -416,10 +417,9 @@ CLASS zial_cl_log IMPLEMENTATION.
 
     LOOP AT io_struct_descr->components ASSIGNING FIELD-SYMBOL(<ls_component>).
 
-      IF it_fnam IS NOT INITIAL.
-        IF NOT line_exists( it_fnam[ table_line = <ls_component>-name ] ).
-          CONTINUE.
-        ENDIF.
+      IF         it_fnam IS NOT INITIAL
+         AND NOT line_exists( it_fnam[ table_line = <ls_component>-name ] ).
+        CONTINUE.
       ENDIF.
 
       ASSIGN COMPONENT <ls_component>-name OF STRUCTURE is_data TO FIELD-SYMBOL(<lv_value>).

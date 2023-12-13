@@ -43,28 +43,26 @@ CLASS zial_cl_log_ewm DEFINITION
     CLASS-DATA mv_has_error  TYPE abap_bool.
     CLASS-DATA mv_save_error TYPE abap_bool.
 
-    DATA mv_lgnum         TYPE /scwm/lgnum.
-    DATA mo_sap_log       TYPE REF TO /scwm/cl_log.
+    DATA mv_lgnum            TYPE /scwm/lgnum.
+    DATA mo_sap_log          TYPE REF TO /scwm/cl_log.
 
-    DATA message_text     TYPE bapi_msg.
-    DATA message_type     TYPE symsgty.
-    DATA content_type     TYPE i.
-    DATA message_class    TYPE symsgid.
-    DATA message_params   TYPE bal_s_parm.
-    DATA message_number   TYPE symsgno.
-    DATA message_var1     TYPE symsgv.
-    DATA message_var2     TYPE symsgv.
-    DATA message_var3     TYPE symsgv.
-    DATA message_var4     TYPE symsgv.
-    DATA message_priority TYPE balprobcl.
-    DATA message_context  TYPE bal_s_cont.
+    DATA mv_message_text     TYPE bapi_msg.
+    DATA mv_message_type     TYPE symsgty.
+    DATA mv_content_type     TYPE i.
+    DATA mv_message_class    TYPE symsgid.
+    DATA ms_message_params   TYPE bal_s_parm.
+    DATA mv_message_number   TYPE symsgno.
+    DATA mv_message_var1     TYPE symsgv.
+    DATA mv_message_var2     TYPE symsgv.
+    DATA mv_message_var3     TYPE symsgv.
+    DATA mv_message_var4     TYPE symsgv.
+    DATA mv_message_priority TYPE balprobcl.
+    DATA ms_message_context  TYPE bal_s_cont.
 
-    DATA message_detail   TYPE /scwm/tt_msg_details.
+    DATA mt_message_detail   TYPE /scwm/tt_msg_details.
 
     METHODS handle_error              REDEFINITION.
-
     METHODS build_validity            REDEFINITION.
-
     METHODS add_msg_by_message_object REDEFINITION.
     METHODS add_msg_by_message_text   REDEFINITION.
 
@@ -76,13 +74,13 @@ CLASS zial_cl_log_ewm IMPLEMENTATION.
   METHOD add_msg_by_message_object.
 
     IF mo_sap_log IS BOUND.
-      mo_sap_log->add_message( ip_msgty = message_type
-                               ip_msgid = message_class
-                               ip_msgno = message_number
-                               ip_msgv1 = message_var1
-                               ip_msgv2 = message_var2
-                               ip_msgv3 = message_var3
-                               ip_msgv4 = message_var4 ).
+      mo_sap_log->add_message( ip_msgty = mv_message_type
+                               ip_msgid = mv_message_class
+                               ip_msgno = mv_message_number
+                               ip_msgv1 = mv_message_var1
+                               ip_msgv2 = mv_message_var2
+                               ip_msgv3 = mv_message_var3
+                               ip_msgv4 = mv_message_var4 ).
     ENDIF.
 
     super->add_msg_by_message_object( ).
@@ -93,8 +91,8 @@ CLASS zial_cl_log_ewm IMPLEMENTATION.
   METHOD add_msg_by_message_text.
 
     IF mo_sap_log IS BOUND.
-      mo_sap_log->add_message( ip_msgty = message_type
-                               ip_msg   = message_text ).
+      mo_sap_log->add_message( ip_msgty = mv_message_type
+                               ip_msg   = mv_message_text ).
     ENDIF.
 
     super->add_msg_by_message_text( ).
@@ -126,8 +124,8 @@ CLASS zial_cl_log_ewm IMPLEMENTATION.
 
       ENDCASE.
 
-      IF     sy-subrc            = 0
-         AND ls_log_act-validity > 0.
+      IF     sy-subrc            EQ 0
+         AND ls_log_act-validity GT 0.
 
         " Append valid expiration date
         CALL FUNCTION '/SCWM/APP_LOG_EXPIRY_DATE_DET'
@@ -228,7 +226,7 @@ CLASS zial_cl_log_ewm IMPLEMENTATION.
   METHOD log_dm_message.
 
     LOOP AT it_dm_message ASSIGNING FIELD-SYMBOL(<ls_dm_message>).
-      me->log_sy_message( is_symsg = CORRESPONDING #( <ls_dm_message> ) ).
+      log_sy_message( is_symsg = CORRESPONDING #( <ls_dm_message> ) ).
     ENDLOOP.
 
   ENDMETHOD.
@@ -238,7 +236,7 @@ CLASS zial_cl_log_ewm IMPLEMENTATION.
 
     CHECK io_log IS BOUND.
 
-    me->log_bapiret( io_log->get_prot( ) ).
+    log_bapiret( io_log->get_prot( ) ).
 
   ENDMETHOD.
 
