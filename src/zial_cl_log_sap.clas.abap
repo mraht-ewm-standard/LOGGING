@@ -4,7 +4,23 @@ CLASS zial_cl_log_sap DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
+    TYPES t_spar TYPE STANDARD TABLE OF spar WITH DEFAULT KEY.
+
     CONSTANTS mc_class_name TYPE classname VALUE 'ZIAL_CL_LOG_SAP'.
+
+    CONSTANTS: BEGIN OF mc_msgde_callback_type,
+                 form     TYPE baluet VALUE ' ',
+                 function TYPE baluet VALUE 'F',
+               END OF mc_msgde_callback_type.
+
+    CONSTANTS: BEGIN OF mc_msgde_callback,
+                 baluef      TYPE baluef VALUE 'ZIAL_FM_LOG_CALLBACK',
+                 baluep      TYPE baluep VALUE 'ZIAL_R_BS_LOG_CALLBACK',
+                 baluep_form TYPE baluef VALUE 'ON_CLICK_MSG_DETAIL',
+               END OF mc_msgde_callback.
+
+    CLASS-METHODS on_log_callback
+      IMPORTING it_params TYPE t_spar.
 
     "! Initialize log instance
     "!
@@ -171,6 +187,7 @@ CLASS zial_cl_log_sap DEFINITION
     DATA mv_log_counter       TYPE i.
 
     DATA mv_msg_param_id      TYPE zial_cl_log=>v_message_param_id.
+    DATA ms_msg_details       TYPE zial_s_msg_details.
     DATA mt_msg_details       TYPE zial_tt_msg_details.
     DATA mt_msg_details_input TYPE rsra_t_alert_definition.
 
@@ -235,6 +252,7 @@ CLASS zial_cl_log_sap DEFINITION
       IMPORTING it_new_lognumbers TYPE bal_t_lgnm.
 
     METHODS create_log.
+    METHODS delete_log.
 
   PRIVATE SECTION.
     CLASS-DATA mv_has_error  TYPE abap_bool.
@@ -304,10 +322,9 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
     CHECK mt_msg_details_input IS NOT INITIAL.
 
-    " Add message identifier, example SBAL_CALLBACK
-    ms_msg_params-callback = VALUE #( userexitp = zial_cl_log=>mc_msgde_callback-report
-                                      userexitf = zial_cl_log=>mc_msgde_callback-routine
-                                      userexitt = space ).
+    " Add message identifier, s. include LSBAL_DETAILF02 (example: SBAL_CALLBACK)
+    ms_msg_params-callback = VALUE #( userexitf = mc_msgde_callback-baluef
+                                      userexitt = mc_msgde_callback_type-function ).
 
     mv_msg_param_id = mv_msg_param_id + 1.
     APPEND VALUE #( parname  = zial_cl_log=>mc_msg_ident
@@ -597,8 +614,7 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
                                                             msgv4 = mv_msg_var4 ) ).
 
     " Try to add error messages regarding failed logging to old log
-    " TODO: variable is assigned but never used; add pragma ##NEEDED (ABAP cleaner)
-    MESSAGE e001(zial_log) INTO DATA(lv_msg).
+    MESSAGE e001(zial_log) INTO DATA(lv_msg) ##NEEDED.
     log_message( ).
 
     " Close existing log and create a new one for error handling
@@ -968,7 +984,6 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
     DATA(lt_log_handles)    = VALUE bal_t_logh( ( mv_log_handle ) ).
     DATA(lt_new_lognumbers) = VALUE bal_t_lgnm( ).
-
     CALL FUNCTION 'BAL_DB_SAVE'
       EXPORTING  i_t_log_handle       = lt_log_handles
                  i_save_all           = abap_false
@@ -983,18 +998,13 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
     CASE sy-subrc.
       WHEN 0.
         save_msgde( lt_new_lognumbers ).
+        COMMIT WORK.
 
       WHEN OTHERS.
-        CALL FUNCTION 'BAL_LOG_DELETE'
-          EXPORTING  i_log_handle  = mv_log_handle
-          EXCEPTIONS log_not_found = 1
-                     OTHERS        = 2.
-
-        CLEAR: ms_log_header,
-               mv_log_handle.
-
+        DATA(lv_subrc) = sy-subrc.
+        delete_log( ).
         handle_error( iv_process = zial_cl_log=>mc_log_process-save
-                      iv_subrc   = sy-subrc ).
+                      iv_subrc   = lv_subrc ).
 
     ENDCASE.
 
@@ -1006,10 +1016,8 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
     CHECK it_new_lognumbers IS NOT INITIAL.
 
     ASSIGN it_new_lognumbers[ lines( it_new_lognumbers ) ] TO FIELD-SYMBOL(<ls_new_lognumber>).
-    IF    mt_msg_details     IS INITIAL
-       OR <ls_new_lognumber> IS NOT ASSIGNED.
-      RETURN.
-    ENDIF.
+    CHECK mt_msg_details     IS NOT INITIAL
+      AND <ls_new_lognumber> IS ASSIGNED.
 
     " EWM: /SCWM/DLV_EXPORT_LOG
     EXPORT msg_details FROM mt_msg_details TO DATABASE bal_indx(al) ID <ls_new_lognumber>-lognumber.
@@ -1140,6 +1148,97 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
       handle_error( iv_process = zial_cl_log=>mc_log_process-init
                     iv_subrc   = sy-subrc ).
     ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD on_log_callback.
+
+    CONSTANTS lc_log_number TYPE spo_par VALUE '%LOGNUMBER'.
+
+    DATA lv_log_number     TYPE balognr.
+    DATA lv_msg_param_id   TYPE zial_cl_log=>v_message_param_id.
+    DATA ls_structure_name TYPE dd02l-tabname.
+
+    FIELD-SYMBOLS <lt_outtab> TYPE STANDARD TABLE.
+
+    " Find out the identifier for this message
+    lv_log_number = VALUE #( it_params[ param = lc_log_number ]-value OPTIONAL ).
+    CHECK lv_log_number IS NOT INITIAL.
+
+    " Load specific message details from database
+    DATA(lt_msg_details) = VALUE /scwm/tt_msg_details( ).
+    IMPORT msg_details TO lt_msg_details FROM DATABASE bal_indx(al) ID lv_log_number.
+    IF sy-subrc EQ 4.
+      MESSAGE s019(zial_log) DISPLAY LIKE 'E'.
+    ENDIF.
+
+    CHECK lt_msg_details IS NOT INITIAL.
+
+    lv_msg_param_id = VALUE #( it_params[ param = zial_cl_log=>mc_msg_ident ]-value OPTIONAL ).
+    CHECK lv_msg_param_id IS NOT INITIAL.
+
+    " Search for those entries which belong to this message
+    ASSIGN lt_msg_details[ v_id = lv_msg_param_id ] TO FIELD-SYMBOL(<ls_msg_details>).
+    CHECK <ls_msg_details> IS ASSIGNED.
+
+    IF zial_cl_log=>mo_gui_alv_grid IS NOT INITIAL.
+      zial_cl_log=>mo_gui_alv_grid->free( ).
+      CLEAR zial_cl_log=>mo_gui_alv_grid.
+    ENDIF.
+
+    "    Show container if not visible
+    " OR Hide container if detail to same message was again being selected
+    IF     zial_cl_log=>mo_gui_docking_container IS BOUND
+       AND zial_cl_log=>mv_sel_msg_param_id      EQ lv_msg_param_id.
+
+      zial_cl_log=>mo_gui_docking_container->free( ).
+      CLEAR: zial_cl_log=>mo_gui_docking_container,
+             zial_cl_log=>mv_sel_msg_param_id.
+
+    ELSEIF zial_cl_log=>mo_gui_docking_container IS NOT BOUND.
+
+      zial_cl_log=>mo_gui_docking_container = NEW #( side      = cl_gui_docking_container=>dock_at_bottom
+                                                     extension = '120' ).
+      zial_cl_log=>mo_gui_docking_container->set_visible( abap_true ).
+
+    ENDIF.
+
+    CHECK zial_cl_log=>mo_gui_docking_container IS BOUND.
+
+    zial_cl_log=>mo_gui_alv_grid = NEW #( i_parent = zial_cl_log=>mo_gui_docking_container ).
+
+    DATA(ls_layout) = VALUE lvc_s_layo( cwidth_opt = 'X'
+                                        sel_mode   = 'D' ).
+    DATA(lt_alv_fcodes_excl) = VALUE ui_functions( ( cl_gui_alv_grid=>mc_fc_graph )
+                                                   ( cl_gui_alv_grid=>mc_fc_info )
+                                                   ( cl_gui_alv_grid=>mc_fc_excl_all ) ).
+
+    IF <ls_msg_details>-t_input_parameter IS NOT INITIAL.
+      ls_structure_name = '/SCWM/RSRA_S_PARAMETER'.
+      ASSIGN <ls_msg_details>-t_input_parameter TO <lt_outtab>.
+    ENDIF.
+
+    CHECK <lt_outtab> IS ASSIGNED.
+
+    zial_cl_log=>mo_gui_alv_grid->set_table_for_first_display( EXPORTING i_structure_name     = ls_structure_name
+                                                                         is_layout            = ls_layout
+                                                                         it_toolbar_excluding = lt_alv_fcodes_excl
+                                                               CHANGING  it_outtab            = <lt_outtab> ).
+
+    zial_cl_log=>mv_sel_msg_param_id = lv_msg_param_id.
+
+  ENDMETHOD.
+
+
+  METHOD delete_log.
+
+    CALL FUNCTION 'BAL_LOG_DELETE'
+      EXPORTING  i_log_handle = mv_log_handle
+      EXCEPTIONS OTHERS       = 0.
+
+    CLEAR: ms_log_header,
+           mv_log_handle.
 
   ENDMETHOD.
 

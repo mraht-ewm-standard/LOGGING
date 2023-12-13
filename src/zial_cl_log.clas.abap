@@ -32,11 +32,6 @@ CLASS zial_cl_log DEFINITION
     CONSTANTS mc_msg_ident          TYPE c LENGTH 9 VALUE 'MSG_IDENT' ##NO_TEXT.
     CONSTANTS mc_log_context_struct TYPE baltabname VALUE 'ZIAL_S_LOG_CONTEXT' ##NO_TEXT.
 
-    CONSTANTS: BEGIN OF mc_msgde_callback,
-                 report  TYPE baluep VALUE 'ZIAL_R_BS_LOG_CALLBACK',
-                 routine TYPE baluef VALUE 'ON_CLICK_MSG_DETAIL',
-               END OF mc_msgde_callback.
-
     CONSTANTS: BEGIN OF mc_callstack_lvl,
                  none    TYPE numc1 VALUE 0,
                  error   TYPE numc1 VALUE 1,
@@ -177,7 +172,8 @@ CLASS zial_cl_log IMPLEMENTATION.
 
     DATA(lt_bapiret) = it_bapiret.
     CALL FUNCTION 'RSCRMBW_DISPLAY_BAPIRET2'
-      TABLES it_return = lt_bapiret.
+      TABLES
+        it_return = lt_bapiret.
 
   ENDMETHOD.
 
@@ -317,14 +313,16 @@ CLASS zial_cl_log IMPLEMENTATION.
     ENDIF.
 
     CALL FUNCTION 'BALW_BAPIRETURN_GET2'
-      EXPORTING type   = rs_bapiret-type
-                cl     = rs_bapiret-id
-                number = rs_bapiret-number
-                par1   = rs_bapiret-message_v1
-                par2   = rs_bapiret-message_v2
-                par3   = rs_bapiret-message_v3
-                par4   = rs_bapiret-message_v4
-      IMPORTING return = rs_bapiret.
+      EXPORTING
+        type   = rs_bapiret-type
+        cl     = rs_bapiret-id
+        number = rs_bapiret-number
+        par1   = rs_bapiret-message_v1
+        par2   = rs_bapiret-message_v2
+        par3   = rs_bapiret-message_v3
+        par4   = rs_bapiret-message_v4
+      IMPORTING
+        return = rs_bapiret.
 
   ENDMETHOD.
 
