@@ -364,7 +364,16 @@
       },
       "select_performance": false,
       "select_single_full_key": true,
-      "selection_screen_naming": true,
+      "selection_screen_naming": {
+         "exclude": [],
+        "severity": "Error",
+        "patternKind": "required",
+        "ignoreNames": [],
+        "ignorePatterns": [],
+        "parameter": "^P_.+$",
+        "selectOption": "^S_.+$",
+        "screenElement": "^L_.+$"
+      },
       "sequential_blank": {
         "lines": 4
       },
