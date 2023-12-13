@@ -111,16 +111,16 @@ CLASS zial_cl_log_ewm IMPLEMENTATION.
           " Note: Configure Z-Subobject of Object
           " /SCWM/WME in Transaction/SCWM/ACTLOG
           CALL FUNCTION '/SCWM/LOG_ACT_READ_SINGLE'
-            EXPORTING  iv_lgnum     = me->mv_lgnum
+            EXPORTING  iv_lgnum     = mv_lgnum
                        iv_subobject = ms_log_header-subobject
             IMPORTING  es_log_act   = ls_log_act
             EXCEPTIONS not_found    = 1
                        OTHERS       = 2.
 
         WHEN 2.
-          ls_log_act-lgnum     = me->mv_lgnum.
+          ls_log_act-lgnum     = mv_lgnum.
           ls_log_act-subobject = ms_log_header-subobject.
-          ls_log_act-validity  = me->mv_validity_in_days.
+          ls_log_act-validity  = mv_validity_in_days.
 
       ENDCASE.
 
@@ -169,7 +169,7 @@ CLASS zial_cl_log_ewm IMPLEMENTATION.
     " Close existing log and create a new one for error handling
     save( ).
 
-    DATA(lo_log_sap) = NEW zial_cl_log_ewm( iv_lgnum     = me->mv_lgnum
+    DATA(lo_log_sap) = NEW zial_cl_log_ewm( iv_lgnum     = mv_lgnum
                                             iv_object    = zial_cl_log=>mc_default-log_object
                                             iv_subobject = zial_cl_log=>mc_default-log_subobject
                                             iv_extnumber = TEXT-000 ).
@@ -201,15 +201,15 @@ CLASS zial_cl_log_ewm IMPLEMENTATION.
                         it_extnumber     = it_extnumber
                         iv_callstack_lvl = iv_callstack_lvl ).
 
-    me->mv_lgnum   = iv_lgnum.
-    me->mo_sap_log = io_sap_log.
+    mv_lgnum   = iv_lgnum.
+    mo_sap_log = io_sap_log.
 
   ENDMETHOD.
 
 
   METHOD set_lgnum.
 
-    me->mv_lgnum = iv_lgnum.
+    mv_lgnum = iv_lgnum.
 
   ENDMETHOD.
 

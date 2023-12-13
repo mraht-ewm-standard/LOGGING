@@ -351,9 +351,7 @@ CLASS zial_cl_log IMPLEMENTATION.
 
     ELSEIF it_data IS NOT INITIAL.
 
-      DATA lo_table_descr TYPE REF TO cl_abap_tabledescr.
-
-      lo_table_descr ?= cl_abap_typedescr=>describe_by_data( it_data ).
+      DATA(lo_table_descr) = CAST cl_abap_tabledescr( cl_abap_typedescr=>describe_by_data( it_data ) ).
       DATA(lo_data_descr) = lo_table_descr->get_table_line_type( ).
 
       IF     it_fnam             IS NOT INITIAL
