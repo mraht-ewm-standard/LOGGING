@@ -358,6 +358,184 @@ CLASS zial_cl_log IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD has_error.
+
+    IF iv_severity CA mc_msgty-any_error.
+      rv_result = abap_true.
+      RETURN.
+    ENDIF.
+
+    LOOP AT it_bapiret TRANSPORTING NO FIELDS WHERE type CA mc_msgty-any_error.
+      rv_result = abap_true.
+      EXIT.
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
+  METHOD recover_sy_msg.
+
+    CHECK mo_instance->has_error( ) EQ abap_false.
+
+    sy-msgid = ms_symsg-msgid.
+    sy-msgno = ms_symsg-msgno.
+    sy-msgty = ms_symsg-msgty.
+    sy-msgv1 = ms_symsg-msgv1.
+    sy-msgv2 = ms_symsg-msgv2.
+    sy-msgv3 = ms_symsg-msgv3.
+    sy-msgv4 = ms_symsg-msgv4.
+
+  ENDMETHOD.
+
+
+  METHOD save.
+
+    CHECK zial_cl_log_stack=>is_empty( ) EQ abap_false.
+
+    mo_instance = get( ).
+    mo_instance->save( iv_finalize ).
+
+  ENDMETHOD.
+
+
+  METHOD show_msgtx.
+
+    DATA(lv_msgdl) = iv_msgdl.
+    IF lv_msgdl IS INITIAL.
+      lv_msgdl = iv_msgty.
+    ENDIF.
+
+    DATA(lv_msgtx) = iv_msgtx.
+    IF iv_msgv1 IS NOT INITIAL.
+      REPLACE '&1' IN lv_msgtx WITH iv_msgv1.
+    ENDIF.
+    IF iv_msgv2 IS NOT INITIAL.
+      REPLACE '&2' IN lv_msgtx WITH iv_msgv2.
+    ENDIF.
+    IF iv_msgv3 IS NOT INITIAL.
+      REPLACE '&3' IN lv_msgtx WITH iv_msgv3.
+    ENDIF.
+    IF iv_msgv4 IS NOT INITIAL.
+      REPLACE '&4' IN lv_msgtx WITH iv_msgv4.
+    ENDIF.
+
+    MESSAGE lv_msgtx TYPE iv_msgty DISPLAY LIKE lv_msgdl.
+
+  ENDMETHOD.
+
+
+  METHOD to_msgde.
+
+    DATA lo_struct_descr TYPE REF TO cl_abap_structdescr.
+
+    IF is_msgde IS NOT INITIAL.
+
+      APPEND is_msgde TO rt_msgde.
+
+    ELSEIF is_data IS NOT INITIAL.
+
+      lo_struct_descr ?= cl_abap_typedescr=>describe_by_data( is_data ).
+
+      rt_msgde = to_msgde_add_by_components( io_struct_descr = lo_struct_descr
+                                             is_data         = is_data
+                                             it_fnam         = it_fnam ).
+
+    ELSEIF it_data IS NOT INITIAL.
+
+      DATA(lo_table_descr) = CAST cl_abap_tabledescr( cl_abap_typedescr=>describe_by_data( it_data ) ).
+      DATA(lo_data_descr) = lo_table_descr->get_table_line_type( ).
+
+      IF     it_fnam IS NOT INITIAL
+         AND (    lo_data_descr->kind EQ cl_abap_typedescr=>kind_elem
+               OR iv_is_range         EQ abap_true ).
+        ASSIGN it_fnam[ 1 ] TO FIELD-SYMBOL(<lv_fnam>).
+      ENDIF.
+
+      CASE iv_is_range.
+        WHEN abap_true.
+          DATA(lt_r_range) = CONV rseloption( it_data ).
+          IF <lv_fnam> IS ASSIGNED.
+            rt_msgde = VALUE #( FOR <s_r_range> IN lt_r_range
+                                ( fnam = <lv_fnam>
+                                  sign = <s_r_range>-sign
+                                  opt  = <s_r_range>-option
+                                  low  = <s_r_range>-low
+                                  high = <s_r_range>-high ) ).
+          ELSE.
+            rt_msgde = VALUE #( FOR <s_r_range> IN lt_r_range
+                                ( sign = <s_r_range>-sign
+                                  opt  = <s_r_range>-option
+                                  low  = <s_r_range>-low
+                                  high = <s_r_range>-high ) ).
+          ENDIF.
+
+        WHEN abap_false.
+          LOOP AT it_data ASSIGNING FIELD-SYMBOL(<lx_data>).
+
+            CASE lo_data_descr->kind.
+              WHEN cl_abap_typedescr=>kind_elem.
+                IF <lv_fnam> IS ASSIGNED.
+                  INSERT VALUE #( fnam = <lv_fnam>
+                                  low  = <lx_data> ) INTO TABLE rt_msgde.
+                ELSE.
+                  INSERT VALUE #( low = <lx_data> ) INTO TABLE rt_msgde.
+                ENDIF.
+
+              WHEN cl_abap_typedescr=>kind_struct.
+                lo_struct_descr ?= lo_data_descr.
+                INSERT LINES OF to_msgde_add_by_components( io_struct_descr = lo_struct_descr
+                                                            is_data         = <lx_data>
+                                                            it_fnam         = it_fnam ) INTO TABLE rt_msgde.
+
+              WHEN OTHERS.
+                EXIT.
+
+            ENDCASE.
+
+          ENDLOOP.
+
+      ENDCASE.
+
+    ELSE.
+
+      RETURN.
+
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD to_msgde_add_by_components.
+
+    LOOP AT io_struct_descr->components ASSIGNING FIELD-SYMBOL(<ls_component>).
+
+      IF         it_fnam IS NOT INITIAL
+         AND NOT line_exists( it_fnam[ table_line = <ls_component>-name ] ).
+        CONTINUE.
+      ENDIF.
+
+      ASSIGN COMPONENT <ls_component>-name OF STRUCTURE is_data TO FIELD-SYMBOL(<lv_value>).
+      IF <lv_value> IS NOT ASSIGNED.
+        CONTINUE.
+      ENDIF.
+
+      APPEND VALUE #( fnam = <ls_component>-name
+                      low  = <lv_value> ) TO rt_msgde.
+
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
+  METHOD get_last_error.
+
+    LOOP AT it_bapiret INTO rs_bapiret2 WHERE type CA mc_msgty-any_error.
+      EXIT.
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
   METHOD harmonize_msg.
 
     CLEAR: ev_msgtx,
@@ -428,72 +606,6 @@ CLASS zial_cl_log IMPLEMENTATION.
                         msgv2 = lv_msgv2
                         msgv3 = lv_msgv3
                         msgv4 = lv_msgv4 ).
-
-  ENDMETHOD.
-
-
-  METHOD has_error.
-
-    IF iv_severity CA 'AEX'.
-      rv_result = abap_true.
-      RETURN.
-    ENDIF.
-
-    LOOP AT it_bapiret TRANSPORTING NO FIELDS WHERE type CA 'AEX'.
-      rv_result = abap_true.
-      EXIT.
-    ENDLOOP.
-
-  ENDMETHOD.
-
-
-  METHOD recover_sy_msg.
-
-    CHECK mo_instance->has_error( ) EQ abap_false.
-
-    sy-msgid = ms_symsg-msgid.
-    sy-msgno = ms_symsg-msgno.
-    sy-msgty = ms_symsg-msgty.
-    sy-msgv1 = ms_symsg-msgv1.
-    sy-msgv2 = ms_symsg-msgv2.
-    sy-msgv3 = ms_symsg-msgv3.
-    sy-msgv4 = ms_symsg-msgv4.
-
-  ENDMETHOD.
-
-
-  METHOD save.
-
-    CHECK zial_cl_log_stack=>is_empty( ) EQ abap_false.
-
-    mo_instance = get( ).
-    mo_instance->save( iv_finalize ).
-
-  ENDMETHOD.
-
-
-  METHOD show_msgtx.
-
-    DATA(lv_msgdl) = iv_msgdl.
-    IF lv_msgdl IS INITIAL.
-      lv_msgdl = iv_msgty.
-    ENDIF.
-
-    DATA(lv_msgtx) = iv_msgtx.
-    IF iv_msgv1 IS NOT INITIAL.
-      REPLACE '&1' IN lv_msgtx WITH iv_msgv1.
-    ENDIF.
-    IF iv_msgv2 IS NOT INITIAL.
-      REPLACE '&2' IN lv_msgtx WITH iv_msgv2.
-    ENDIF.
-    IF iv_msgv3 IS NOT INITIAL.
-      REPLACE '&3' IN lv_msgtx WITH iv_msgv3.
-    ENDIF.
-    IF iv_msgv4 IS NOT INITIAL.
-      REPLACE '&4' IN lv_msgtx WITH iv_msgv4.
-    ENDIF.
-
-    MESSAGE lv_msgtx TYPE iv_msgty DISPLAY LIKE lv_msgdl.
 
   ENDMETHOD.
 
@@ -602,121 +714,16 @@ CLASS zial_cl_log IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD to_msgde.
-
-    DATA lo_struct_descr TYPE REF TO cl_abap_structdescr.
-
-    IF is_msgde IS NOT INITIAL.
-
-      APPEND is_msgde TO rt_msgde.
-
-    ELSEIF is_data IS NOT INITIAL.
-
-      lo_struct_descr ?= cl_abap_typedescr=>describe_by_data( is_data ).
-
-      rt_msgde = to_msgde_add_by_components( io_struct_descr = lo_struct_descr
-                                             is_data         = is_data
-                                             it_fnam         = it_fnam ).
-
-    ELSEIF it_data IS NOT INITIAL.
-
-      DATA(lo_table_descr) = CAST cl_abap_tabledescr( cl_abap_typedescr=>describe_by_data( it_data ) ).
-      DATA(lo_data_descr) = lo_table_descr->get_table_line_type( ).
-
-      IF     it_fnam IS NOT INITIAL
-         AND (    lo_data_descr->kind EQ cl_abap_typedescr=>kind_elem
-               OR iv_is_range         EQ abap_true ).
-        ASSIGN it_fnam[ 1 ] TO FIELD-SYMBOL(<lv_fnam>).
-      ENDIF.
-
-      CASE iv_is_range.
-        WHEN abap_true.
-          DATA(lt_r_range) = CONV rseloption( it_data ).
-          IF <lv_fnam> IS ASSIGNED.
-            rt_msgde = VALUE #( FOR <s_r_range> IN lt_r_range
-                                ( fnam = <lv_fnam>
-                                  sign = <s_r_range>-sign
-                                  opt  = <s_r_range>-option
-                                  low  = <s_r_range>-low
-                                  high = <s_r_range>-high ) ).
-          ELSE.
-            rt_msgde = VALUE #( FOR <s_r_range> IN lt_r_range
-                                ( sign = <s_r_range>-sign
-                                  opt  = <s_r_range>-option
-                                  low  = <s_r_range>-low
-                                  high = <s_r_range>-high ) ).
-          ENDIF.
-
-        WHEN abap_false.
-          LOOP AT it_data ASSIGNING FIELD-SYMBOL(<lx_data>).
-
-            CASE lo_data_descr->kind.
-              WHEN cl_abap_typedescr=>kind_elem.
-                IF <lv_fnam> IS ASSIGNED.
-                  INSERT VALUE #( fnam = <lv_fnam>
-                                  low  = <lx_data> ) INTO TABLE rt_msgde.
-                ELSE.
-                  INSERT VALUE #( low = <lx_data> ) INTO TABLE rt_msgde.
-                ENDIF.
-
-              WHEN cl_abap_typedescr=>kind_struct.
-                lo_struct_descr ?= lo_data_descr.
-                INSERT LINES OF to_msgde_add_by_components( io_struct_descr = lo_struct_descr
-                                                            is_data         = <lx_data>
-                                                            it_fnam         = it_fnam ) INTO TABLE rt_msgde.
-
-              WHEN OTHERS.
-                EXIT.
-
-            ENDCASE.
-
-          ENDLOOP.
-
-      ENDCASE.
-
-    ELSE.
-
-      RETURN.
-
-    ENDIF.
-
-  ENDMETHOD.
-
-
-  METHOD to_msgde_add_by_components.
-
-    LOOP AT io_struct_descr->components ASSIGNING FIELD-SYMBOL(<ls_component>).
-
-      IF         it_fnam IS NOT INITIAL
-         AND NOT line_exists( it_fnam[ table_line = <ls_component>-name ] ).
-        CONTINUE.
-      ENDIF.
-
-      ASSIGN COMPONENT <ls_component>-name OF STRUCTURE is_data TO FIELD-SYMBOL(<lv_value>).
-      IF <lv_value> IS NOT ASSIGNED.
-        CONTINUE.
-      ENDIF.
-
-      APPEND VALUE #( fnam = <ls_component>-name
-                      low  = <lv_value> ) TO rt_msgde.
-
-    ENDLOOP.
-
-  ENDMETHOD.
-
-
   METHOD to_string.
 
-    harmonize_msg( EXPORTING iv_msgid   = iv_msgid
-                             iv_msgno   = iv_msgno
-                             iv_msgty   = iv_msgty
-                             iv_msgv1   = iv_msgv1
-                             iv_msgv2   = iv_msgv2
-                             iv_msgv3   = iv_msgv3
-                             iv_msgv4   = iv_msgv4
-                             is_bapiret = is_bapiret
-                   IMPORTING es_symsg   = DATA(ls_symsg) ).
-
+    DATA(ls_symsg) = to_symsg( iv_msgid   = iv_msgid
+                               iv_msgno   = iv_msgno
+                               iv_msgty   = iv_msgty
+                               iv_msgv1   = iv_msgv1
+                               iv_msgv2   = iv_msgv2
+                               iv_msgv3   = iv_msgv3
+                               iv_msgv4   = iv_msgv4
+                               is_bapiret = is_bapiret ).
     IF ls_symsg IS NOT INITIAL.
       MESSAGE ID ls_symsg-msgid TYPE ls_symsg-msgty NUMBER ls_symsg-msgno
               WITH ls_symsg-msgv1 ls_symsg-msgv2 ls_symsg-msgv3 ls_symsg-msgv4
@@ -738,15 +745,6 @@ CLASS zial_cl_log IMPLEMENTATION.
                              iv_msgv4   = iv_msgv4
                              is_bapiret = is_bapiret
                    IMPORTING es_symsg   = rs_symsg ).
-
-  ENDMETHOD.
-
-
-  METHOD get_last_error.
-
-    LOOP AT it_bapiret INTO rs_bapiret2 WHERE type CA mc_msgty-any_error.
-      EXIT.
-    ENDLOOP.
 
   ENDMETHOD.
 
