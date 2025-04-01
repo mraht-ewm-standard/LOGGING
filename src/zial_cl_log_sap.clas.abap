@@ -978,17 +978,17 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
     ms_log-msg-msgty = iv_msgty.
     IF ms_log-msg-msgty IS INITIAL.
-      ms_log-msg-msgty = zial_cl_log=>mc_default-msgty.
+      ms_log-msg-msgty = zial_cl_log_msg=>mc_default-msgty.
     ENDIF.
 
     ms_log-msg-msgid = iv_msgid.
     IF ms_log-msg-msgid IS INITIAL.
-      ms_log-msg-msgid = zial_cl_log=>mc_default-msgid.
+      ms_log-msg-msgid = zial_cl_log_msg=>mc_default-msgid.
     ENDIF.
 
     ms_log-msg-msgno = iv_msgno.
     IF ms_log-msg-msgno IS INITIAL.
-      ms_log-msg-msgno = zial_cl_log=>mc_default-msgno.
+      ms_log-msg-msgno = zial_cl_log_msg=>mc_default-msgno.
     ENDIF.
 
     ms_log-msg-msgv1 = iv_msgv1.
