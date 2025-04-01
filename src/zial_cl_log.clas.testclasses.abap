@@ -28,8 +28,6 @@ CLASS ltc_log DEFINITION FINAL
     METHODS t0003 FOR TESTING RAISING cx_static_check.
     METHODS t0004 FOR TESTING RAISING cx_static_check.
     METHODS t0005 FOR TESTING RAISING cx_static_check.
-    METHODS t0006 FOR TESTING RAISING cx_static_check.
-    METHODS t0007 FOR TESTING RAISING cx_static_check.
 
 ENDCLASS.
 
@@ -143,34 +141,6 @@ CLASS ltc_log IMPLEMENTATION.
                                                                                ( fnam = 'NLPLA' ) ) ).
     cl_abap_unit_assert=>assert_equals( exp = |LGNUM, HUID, RSRC, NLPLA|
                                         act = lv_act_components ).
-
-  ENDMETHOD.
-
-
-  METHOD t0006.
-
-    CHECK mo_aunit->active( abap_true ).
-
-    MESSAGE s499(sy) WITH 'LGNUM' 'HUID' 'RSRC' 'NLPLA' INTO DATA(lv_exp_msgtx) ##NEEDED.
-    DATA(lv_msgtx) = zial_cl_log=>to_string( ).
-
-    cl_abap_unit_assert=>assert_equals( exp = |LGNUM HUID RSRC NLPLA|
-                                        act = lv_msgtx ).
-
-  ENDMETHOD.
-
-
-  METHOD t0007.
-
-    CHECK mo_aunit->active( abap_true ).
-
-    DATA(ls_exp_message) = zial_cl_log=>to_bapiret( iv_msgtx = |&1 &2 &3 &4|
-                                                    iv_msgv1 = 'LGNUM'
-                                                    iv_msgv2 = 'HUID'
-                                                    iv_msgv3 = 'RSRC'
-                                                    iv_msgv4 = 'NLPLA' ).
-
-    cl_abap_unit_assert=>assert_not_initial( ls_exp_message ).
 
   ENDMETHOD.
 

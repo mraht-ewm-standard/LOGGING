@@ -1,4 +1,4 @@
-CLASS zial_apack_logging DEFINITION
+CLASS zial_apack_logging_core DEFINITION
   PUBLIC FINAL
   CREATE PUBLIC.
 
@@ -10,7 +10,7 @@ CLASS zial_apack_logging DEFINITION
 ENDCLASS.
 
 
-CLASS zial_apack_logging IMPLEMENTATION.
+CLASS zial_apack_logging_core IMPLEMENTATION.
 
   METHOD constructor.
 
