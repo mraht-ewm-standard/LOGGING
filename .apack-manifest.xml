@@ -3,20 +3,15 @@
  <asx:values>
   <DATA>
    <GROUP_ID>c-a-s.de</GROUP_ID>
-   <ARTIFACT_ID>logging-core</ARTIFACT_ID>
-   <VERSION>01.04.2025.001-rc</VERSION>
+   <ARTIFACT_ID>logging</ARTIFACT_ID>
+   <VERSION>01.05.2025.001-rc</VERSION>
    <REPOSITORY_TYPE>abapGit</REPOSITORY_TYPE>
-   <GIT_URL>https://github.com/mraht-ewm-standard/LOGGING_CORE.git</GIT_URL>
+   <GIT_URL>https://github.com/mraht-ewm-standard/LOGGING.git</GIT_URL>
    <DEPENDENCIES>
     <item>
      <GROUP_ID>c-a-s.de</GROUP_ID>
      <ARTIFACT_ID>aunit</ARTIFACT_ID>
      <GIT_URL>https://github.com/mraht-ewm-standard/AUNIT.git</GIT_URL>
-    </item>
-    <item>
-     <GROUP_ID>c-a-s.de</GROUP_ID>
-     <ARTIFACT_ID>logging-msg</ARTIFACT_ID>
-     <GIT_URL>https://github.com/mraht-ewm-standard/LOGGING_MSG.git</GIT_URL>
     </item>
     <item>
      <GROUP_ID>c-a-s.de</GROUP_ID>
