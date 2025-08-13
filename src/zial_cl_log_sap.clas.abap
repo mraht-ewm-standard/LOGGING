@@ -43,6 +43,8 @@ CLASS zial_cl_log_sap DEFINITION
                 it_extnumber   TYPE stringtab OPTIONAL
                 iv_log_part_id TYPE i         DEFAULT 0.
 
+    METHODS log_callstack.
+
   PROTECTED SECTION.
     TYPES: BEGIN OF s_processing_control,
              has_error   TYPE abap_bool,
@@ -57,7 +59,6 @@ CLASS zial_cl_log_sap DEFINITION
 
     CONSTANTS: BEGIN OF mc_msgde_callback,
                  baluef      TYPE baluef VALUE 'ZIAL_FM_LOG_CALLBACK',
-                 baluep      TYPE baluep VALUE 'ZIAL_R_BS_LOG_CALLBACK',
                  baluep_form TYPE baluef VALUE 'ON_CLICK_MSG_DETAIL',
                END OF mc_msgde_callback.
 
@@ -128,6 +129,7 @@ CLASS zial_cl_log_sap DEFINITION
                 iv_msgv3           TYPE symsgv                  OPTIONAL
                 iv_msgv4           TYPE symsgv                  OPTIONAL
                 it_msgde           TYPE rsra_t_alert_definition OPTIONAL
+                iv_add_callstack   TYPE abap_bool               DEFAULT abap_false
                 iv_is_internal_msg TYPE abap_bool               DEFAULT abap_false.
 
     METHODS add_timestamp
@@ -136,8 +138,9 @@ CLASS zial_cl_log_sap DEFINITION
 
     METHODS set_context.
 
-    METHODS set_callstack
-      CHANGING ct_msgde TYPE rsra_t_alert_definition.
+    METHODS add_callstack
+      IMPORTING iv_add_callstack TYPE abap_bool
+      CHANGING  ct_msgde         TYPE rsra_t_alert_definition.
 
     METHODS add_msg_by_message_text
       IMPORTING is_log_msg           TYPE zial_s_log
@@ -179,6 +182,9 @@ CLASS zial_cl_log_sap DEFINITION
     METHODS det_detail_level
       IMPORTING iv_msgty               TYPE msgty
       RETURNING VALUE(rv_detail_level) TYPE zial_de_log_detail_level.
+
+    METHODS det_callstack
+      RETURNING VALUE(rt_msgde) TYPE rsra_t_alert_definition.
 
   PRIVATE SECTION.
 ENDCLASS.
@@ -294,7 +300,7 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
                  log_header_inconsistent = 2
                  OTHERS                  = 3.
 
-    IF     sy-subrc                        NE 0
+    IF     sy-subrc NE 0
        AND ms_processing_control-has_error EQ abap_false.
       handle_error( iv_process = zial_cl_log=>mc_log_process-init
                     iv_subrc   = sy-subrc ).
@@ -352,7 +358,7 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
       EXCEPTIONS log_header_inconsistent = 1
                  OTHERS                  = 2.
 
-    IF     sy-subrc                        NE 0
+    IF     sy-subrc NE 0
        AND ms_processing_control-has_error EQ abap_false.
       handle_error( iv_process = zial_cl_log=>mc_log_process-init
                     iv_subrc   = sy-subrc ).
@@ -379,9 +385,9 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
       set_context( ).
 
       DATA(lt_msgde) = it_msgde.
-      set_callstack( CHANGING ct_msgde = lt_msgde ).
-
-      set_detail( it_msgde ).
+      add_callstack( EXPORTING iv_add_callstack = iv_add_callstack
+                     CHANGING  ct_msgde         = lt_msgde ).
+      set_detail( lt_msgde ).
 
     ENDIF.
 
@@ -586,7 +592,9 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
         EXCEPTIONS log_not_found  = 1
                    msg_not_found  = 2
                    OTHERS         = 3.
-      CHECK sy-subrc EQ 0.
+      IF sy-subrc NE 0.
+        RETURN.
+      ENDIF.
       rv_result = abap_true.
     ELSE.
       rv_result = abap_true.
@@ -667,9 +675,19 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
     det_caller( ).
 
     MESSAGE s022(zial_log) WITH mv_caller add_timestamp( ) INTO DATA(lv_msgtx).
-    create_message( iv_msgty           = zial_cl_log=>mc_msgty-success
-                    iv_msgtx           = CONV #( lv_msgtx )
-                    iv_is_internal_msg = abap_true ).
+    create_message( iv_msgty = zial_cl_log=>mc_msgty-success
+                    iv_msgtx = CONV #( lv_msgtx )
+                    it_msgde = det_callstack( ) ).
+
+  ENDMETHOD.
+
+
+  METHOD log_callstack.
+
+    MESSAGE s023(zial_log) INTO DATA(lv_msgtx).
+    create_message( iv_msgty = zial_cl_log=>mc_msgty-success
+                    iv_msgtx = CONV #( lv_msgtx )
+                    it_msgde = det_callstack( ) ).
 
   ENDMETHOD.
 
@@ -778,7 +796,9 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
     " Find out the identifier for this message
     lv_log_number = VALUE #( it_params[ param = lc_log_number ]-value OPTIONAL ).
-    CHECK lv_log_number IS NOT INITIAL.
+    IF lv_log_number IS INITIAL.
+      RETURN.
+    ENDIF.
 
     " Load specific message details from database
     DATA(lt_msg_details) = VALUE zial_tt_msg_details( ).
@@ -787,14 +807,20 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
       MESSAGE s019(zial_log) DISPLAY LIKE 'E'.
     ENDIF.
 
-    CHECK lt_msg_details IS NOT INITIAL.
+    IF lt_msg_details IS INITIAL.
+      RETURN.
+    ENDIF.
 
     lv_msg_param_id = VALUE #( it_params[ param = zial_cl_log=>mc_msg_ident ]-value OPTIONAL ).
-    CHECK lv_msg_param_id IS NOT INITIAL.
+    IF lv_msg_param_id IS INITIAL.
+      RETURN.
+    ENDIF.
 
     " Search for those entries which belong to this message
     ASSIGN lt_msg_details[ v_id = lv_msg_param_id ] TO FIELD-SYMBOL(<ls_msg_details>).
-    CHECK <ls_msg_details> IS ASSIGNED.
+    IF <ls_msg_details> IS NOT ASSIGNED.
+      RETURN.
+    ENDIF.
 
     IF zial_cl_log=>mo_gui_alv_grid IS NOT INITIAL.
       zial_cl_log=>mo_gui_alv_grid->free( ).
@@ -818,7 +844,9 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
     ENDIF.
 
-    CHECK zial_cl_log=>mo_gui_docking_container IS BOUND.
+    IF zial_cl_log=>mo_gui_docking_container IS NOT BOUND.
+      RETURN.
+    ENDIF.
 
     zial_cl_log=>mo_gui_alv_grid = NEW #( i_parent = zial_cl_log=>mo_gui_docking_container ).
 
@@ -833,7 +861,9 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
       ASSIGN <ls_msg_details>-t_input_parameter TO <lt_outtab>.
     ENDIF.
 
-    CHECK <lt_outtab> IS ASSIGNED.
+    IF <lt_outtab> IS NOT ASSIGNED.
+      RETURN.
+    ENDIF.
 
     zial_cl_log=>mo_gui_alv_grid->set_table_for_first_display( EXPORTING i_structure_name     = ls_structure_name
                                                                          is_layout            = ls_layout
@@ -914,8 +944,10 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
     CHECK it_new_lognumbers IS NOT INITIAL.
 
     ASSIGN it_new_lognumbers[ lines( it_new_lognumbers ) ] TO FIELD-SYMBOL(<ls_new_lognumber>).
-    CHECK mt_msg_details     IS NOT INITIAL
-      AND <ls_new_lognumber> IS ASSIGNED.
+    IF    mt_msg_details     IS INITIAL
+       OR <ls_new_lognumber> IS NOT ASSIGNED.
+      RETURN.
+    ENDIF.
 
     " EWM: /SCWM/DLV_EXPORT_LOG
     EXPORT msg_details FROM mt_msg_details TO DATABASE bal_indx(al) ID <ls_new_lognumber>-lognumber.
@@ -925,20 +957,28 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD set_callstack.
+  METHOD add_callstack.
 
-    CHECK det_detail_level( ms_log-msg-msgty ) LE ms_log-hdr-level_log_callstack.
+    CHECK iv_add_callstack EQ abap_true
+       OR det_detail_level( ms_log-msg-msgty ) LE ms_log-hdr-level_log_callstack.
+
+    INSERT LINES OF det_callstack( ) INTO TABLE ct_msgde.
+
+  ENDMETHOD.
+
+
+  METHOD det_callstack.
 
     lcl_session=>get_callstack( IMPORTING et_callstack = DATA(lt_callstack) ).
     DELETE lt_callstack WHERE mainprogram CS mc_class_name.
 
     DATA(lv_line) = repeat( val = '-'
                             occ = 80 ).
-    INSERT VALUE #( low = lv_line ) INTO TABLE ct_msgde.
+    INSERT VALUE #( low = lv_line ) INTO TABLE rt_msgde.
     INSERT LINES OF VALUE rsra_t_alert_definition( FOR <s_callstack> IN lt_callstack
                                                    ( low = |{ <s_callstack>-mainprogram }=>| &&
                                                            |{ <s_callstack>-event }, { TEXT-002 } | &&
-                                                           |{ <s_callstack>-line }| ) ) INTO TABLE ct_msgde.
+                                                           |{ <s_callstack>-line }| ) ) INTO TABLE rt_msgde.
 
   ENDMETHOD.
 
@@ -946,8 +986,8 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
   METHOD set_level_log_callstack.
 
     ms_log-hdr-level_log_callstack = zial_cl_log=>mc_detail_level-undef.
-    WHILE ms_log-hdr-detail_level NOT BETWEEN zial_cl_log=>mc_detail_level-none
-                                          AND zial_cl_log=>mc_detail_level-info.
+    WHILE ms_log-hdr-level_log_callstack NOT BETWEEN zial_cl_log=>mc_detail_level-none
+                                                 AND zial_cl_log=>mc_detail_level-info.
 
       CASE sy-index.
         WHEN 1.
