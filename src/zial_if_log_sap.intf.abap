@@ -45,8 +45,10 @@ INTERFACE zial_if_log_sap
   "! <strong>[SAP]</strong> Log symsg messages
   "!
   "! @parameter is_symsg | SAP system message structure
+  "! @parameter it_symsg | SAP system messages
   METHODS log_symsg
-    IMPORTING is_symsg TYPE symsg.
+    IMPORTING is_symsg TYPE symsg     OPTIONAL
+              it_symsg TYPE symsg_tab OPTIONAL.
 
   "! <strong>[SAP]</strong> Log a table of bapi messages
   "!
