@@ -422,7 +422,7 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
                                 WHEN zial_cl_log=>mc_msgty-success THEN zial_cl_log=>mc_detail_level-success
                                 WHEN zial_cl_log=>mc_msgty-warning THEN zial_cl_log=>mc_detail_level-warning
                                 WHEN zial_cl_log=>mc_msgty-error   THEN zial_cl_log=>mc_detail_level-error
-                                ELSE                                    zial_cl_log=>mc_detail_level-info ).
+                                ELSE zial_cl_log=>mc_detail_level-info ).
 
   ENDMETHOD.
 
@@ -773,13 +773,20 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
   METHOD log_symsg.
 
-    log_message( iv_msgty = is_symsg-msgty
-                 iv_msgid = is_symsg-msgid
-                 iv_msgno = is_symsg-msgno
-                 iv_msgv1 = is_symsg-msgv1
-                 iv_msgv2 = is_symsg-msgv2
-                 iv_msgv3 = is_symsg-msgv3
-                 iv_msgv4 = is_symsg-msgv4 ).
+    DATA(lt_symsg) = it_symsg.
+    IF is_symsg IS NOT INITIAL.
+      INSERT is_symsg INTO TABLE lt_symsg.
+    ENDIF.
+
+    LOOP AT lt_symsg ASSIGNING FIELD-SYMBOL(<ls_symsg>).
+      log_message( iv_msgty = <ls_symsg>-msgty
+                   iv_msgid = <ls_symsg>-msgid
+                   iv_msgno = <ls_symsg>-msgno
+                   iv_msgv1 = <ls_symsg>-msgv1
+                   iv_msgv2 = <ls_symsg>-msgv2
+                   iv_msgv3 = <ls_symsg>-msgv3
+                   iv_msgv4 = <ls_symsg>-msgv4 ).
+    ENDLOOP.
 
   ENDMETHOD.
 
