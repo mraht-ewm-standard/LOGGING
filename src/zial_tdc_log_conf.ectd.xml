@@ -115,7 +115,7 @@
          </xsd:complexType>
          <xsd:complexType name="ZIAL_T_LOG_CONF">
           <annotation>
-           <documentation>I==O==C=S=K==D=ZIAL_T_LOG_CONF=A=u=L=000000=doc=Application</documentation>
+           <documentation>I==O==C=S=K==D=ZIAL_T_LOG_CONF=A=u=L=000000=doc=Logging: Con</documentation>
           </annotation>
           <sequence>
            <element name="MANDT" minOccurs="0">
@@ -158,24 +158,34 @@
              </restriction>
             </simpleType>
            </element>
-           <element name="ACTGLOB" minOccurs="0">
+           <element name="DETAIL_LEVEL" minOccurs="0">
             <annotation>
-             <documentation>I==O==C==K==D=/SCWM/DE_ACTGLOB=A=C=L=000001=doc=Application</documentation>
+             <documentation>I==O==C==K==D=ZIAL_DE_LOG_DETAIL_LEVEL=A=N=L=000001=doc=Logg</documentation>
             </annotation>
             <simpleType>
              <restriction base="string">
-              <maxLength value="1"/>
+              <pattern value="\d"/>
              </restriction>
             </simpleType>
            </element>
-           <element name="VALIDITY" minOccurs="0">
+           <element name="VALIDITY_PERIOD" minOccurs="0">
             <annotation>
-             <documentation>I==O==C==K==D=/SCWM/DE_LOG_VALIDITY=A=N=L=000003=doc=Validit</documentation>
+             <documentation>I==O==C==K==D=ZIAL_DE_LOG_VALIDITY_PERIOD=A=N=L=000003=doc=L</documentation>
             </annotation>
             <simpleType>
              <restriction base="string">
               <pattern value="\d+"/>
               <maxLength value="3"/>
+             </restriction>
+            </simpleType>
+           </element>
+           <element name="LEVEL_LOG_CALLSTACK" minOccurs="0">
+            <annotation>
+             <documentation>I==O==C==K==D=ZIAL_DE_LOG_LEVEL_LOG_CALLSTCK=A=N=L=000001=do</documentation>
+            </annotation>
+            <simpleType>
+             <restriction base="string">
+              <pattern value="\d"/>
              </restriction>
             </simpleType>
            </element>
@@ -190,89 +200,37 @@
           <OBJECT>ZIAL_LOG</OBJECT>
           <SUBOBJECT>LOG</SUBOBJECT>
           <UNAME>DUMMY</UNAME>
-          <ACTGLOB>3</ACTGLOB>
-          <VALIDITY>180</VALIDITY>
+          <DETAIL_LEVEL>3</DETAIL_LEVEL>
+          <VALIDITY_PERIOD>180</VALIDITY_PERIOD>
+          <LEVEL_LOG_CALLSTACK/>
          </item>
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
          <item>
           <MANDT>502</MANDT>
           <OBJECT>ZIAL_LOG</OBJECT>
           <SUBOBJECT>LOG</SUBOBJECT>
           <UNAME/>
-          <ACTGLOB>3</ACTGLOB>
-          <VALIDITY>90</VALIDITY>
+          <DETAIL_LEVEL>3</DETAIL_LEVEL>
+          <VALIDITY_PERIOD>90</VALIDITY_PERIOD>
+          <LEVEL_LOG_CALLSTACK>1</LEVEL_LOG_CALLSTACK>
          </item>
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
          <item>
           <MANDT>502</MANDT>
           <OBJECT>ZIAL_LOG</OBJECT>
           <SUBOBJECT/>
           <UNAME>DUMMY</UNAME>
-          <ACTGLOB>4</ACTGLOB>
-          <VALIDITY>30</VALIDITY>
+          <DETAIL_LEVEL>4</DETAIL_LEVEL>
+          <VALIDITY_PERIOD>30</VALIDITY_PERIOD>
+          <LEVEL_LOG_CALLSTACK>2</LEVEL_LOG_CALLSTACK>
          </item>
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
-         
          <item>
           <MANDT>502</MANDT>
           <OBJECT>ZIAL_LOG</OBJECT>
           <SUBOBJECT/>
           <UNAME/>
-          <ACTGLOB>4</ACTGLOB>
-          <VALIDITY>60</VALIDITY>
+          <DETAIL_LEVEL>4</DETAIL_LEVEL>
+          <VALIDITY_PERIOD>60</VALIDITY_PERIOD>
+          <LEVEL_LOG_CALLSTACK>3</LEVEL_LOG_CALLSTACK>
          </item>
-         
-         
-         
-         
-         
-         
-         
-        
-        
-        
-        
-        
-        
-        
         </ddic:ZIAL_TT_LOG_CONF>
        </DEEP_DATA>
       </item>
