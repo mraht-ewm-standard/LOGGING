@@ -25,6 +25,7 @@ CLASS ltc_log_msg DEFINITION FINAL
 
     METHODS t0001 FOR TESTING RAISING cx_static_check.
     METHODS t0002 FOR TESTING RAISING cx_static_check.
+    METHODS t0003 FOR TESTING RAISING cx_static_check.
 
 ENDCLASS.
 
@@ -35,9 +36,7 @@ CLASS ltc_log_msg IMPLEMENTATION.
 
     mo_aunit = zial_cl_aunit=>on_class_setup( iv_tdc_cnt    = mc_tdc_cnt
                                               iv_ign_errors = abap_true
-                                              ir_tdc_data   = REF #( ms_tdc_data )
-                                              it_sql_data   = VALUE #( ( tbl_name = 'ZIAL_T_DUMMY'
-                                                                         tbl_data = REF #( ms_tdc_data-t_dummy ) ) ) ).
+                                              ir_tdc_data   = REF #( ms_tdc_data ) ).
 
   ENDMETHOD.
 
@@ -65,6 +64,7 @@ CLASS ltc_log_msg IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD t0001.
+
     CHECK mo_aunit->active( abap_true ).
 
     MESSAGE s499(sy) WITH 'LGNUM' 'HUID' 'RSRC' 'NLPLA' INTO DATA(lv_exp_msgtx) ##NEEDED.
@@ -72,9 +72,12 @@ CLASS ltc_log_msg IMPLEMENTATION.
 
     cl_abap_unit_assert=>assert_equals( exp = |LGNUM HUID RSRC NLPLA|
                                         act = lv_msgtx ).
+
   ENDMETHOD.
 
+
   METHOD t0002.
+
     CHECK mo_aunit->active( abap_true ).
 
     DATA(ls_exp_message) = zial_cl_log_msg=>to_bapiret( iv_msgtx = |&1 &2 &3 &4|
@@ -83,6 +86,23 @@ CLASS ltc_log_msg IMPLEMENTATION.
                                                         iv_msgv3 = 'RSRC'
                                                         iv_msgv4 = 'NLPLA' ).
     cl_abap_unit_assert=>assert_not_initial( ls_exp_message ).
+
+  ENDMETHOD.
+
+
+  METHOD t0003.
+
+    CHECK mo_aunit->active( abap_true ).
+
+    DATA(lv_msgtx) = zial_cl_log_msg=>to_string( iv_msgtx = 'Test: &1 &2 &3 &4'
+                                                 iv_msgv1 = 'LGNUM'
+                                                 iv_msgv2 = 'HUID'
+                                                 iv_msgv3 = 'RSRC'
+                                                 iv_msgv4 = 'NLPLA' ).
+
+    cl_abap_unit_assert=>assert_equals( exp = |Test: LGNUM HUID RSRC NLPLA|
+                                        act = lv_msgtx ).
+
   ENDMETHOD.
 
 ENDCLASS.

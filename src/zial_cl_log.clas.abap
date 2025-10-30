@@ -111,8 +111,9 @@ CLASS zial_cl_log DEFINITION
     "! Convert bapiret structure to message string
     "!
     "! @parameter iv_msgid   | Message ID
-    "! @parameter iv_msgty   | Message type
     "! @parameter iv_msgno   | Message number
+    "! @parameter iv_msgtx   | Message text
+    "! @parameter iv_msgty   | Message type
     "! @parameter iv_msgv1   | Message variable 1
     "! @parameter iv_msgv2   | Message variable 2
     "! @parameter iv_msgv3   | Message variable 3
@@ -121,8 +122,9 @@ CLASS zial_cl_log DEFINITION
     "! @parameter rv_result  | Message as string
     CLASS-METHODS to_string
       IMPORTING iv_msgid         TYPE symsgid  DEFAULT sy-msgid
-                iv_msgty         TYPE symsgty  DEFAULT sy-msgty
                 iv_msgno         TYPE symsgno  DEFAULT sy-msgno
+                iv_msgtx         TYPE bapi_msg OPTIONAL
+                iv_msgty         TYPE symsgty  DEFAULT sy-msgty
                 iv_msgv1         TYPE symsgv   DEFAULT sy-msgv1
                 iv_msgv2         TYPE symsgv   DEFAULT sy-msgv2
                 iv_msgv3         TYPE symsgv   DEFAULT sy-msgv3
@@ -577,8 +579,9 @@ CLASS zial_cl_log IMPLEMENTATION.
   METHOD to_string.
 
     rv_result = zial_cl_log_msg=>to_string( iv_msgid   = iv_msgid
-                                            iv_msgty   = iv_msgty
                                             iv_msgno   = iv_msgno
+                                            iv_msgtx   = iv_msgtx
+                                            iv_msgty   = iv_msgty
                                             iv_msgv1   = iv_msgv1
                                             iv_msgv2   = iv_msgv2
                                             iv_msgv3   = iv_msgv3
