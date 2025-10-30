@@ -1,0 +1,321 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_ECTD" serializer_version="v1.0.0">
+ <VERSIONS>
+  <VERSION>
+   <ECTD VERSION="1.5">
+    <ATTRIBUTES>
+     <ETOBJ_GNDT>
+      <VERSION>00000001</VERSION>
+      <TWB_TITLE>ZIAL_CL_LOG_CNF</TWB_TITLE>
+      <SOFTCOMP/>
+      <TWB_DEP_RF/>
+      <TWB_DEP_RT/>
+      <TWB_STATUS>X</TWB_STATUS>
+      <TWB_RELE>N</TWB_RELE>
+      <FUSER></FUSER>
+      <FDATE></FDATE>
+      <LUSER></LUSER>
+      <LDATE></LDATE>
+      <LTIME></LTIME>
+      <REL_BAS_F/>
+      <REL_BAS_T/>
+      <SERVICE/>
+      <PVNR/>
+      <BACKUP/>
+     </ETOBJ_GNDT>
+     <ETOBJNOVER>
+      <NAME>ZIAL_TDC_LOG_CNF</NAME>
+      <TYPE>ECTD</TYPE>
+      <TWB_RESP></TWB_RESP>
+      <TWB_DISTL>B</TWB_DISTL>
+      <TWB_EUBOBJ/>
+      <TWB_EUTYPE/>
+      <DEVCLASS></DEVCLASS>
+      <MASTERLANG>E</MASTERLANG>
+      <TADIR_RESP></TADIR_RESP>
+      <FRANGE>SCM-EWM</FRANGE>
+      <BCSET_MODE/>
+      <API_MODE/>
+      <COL_TSTOBJDATA/>
+      <NO_TRANSLATION/>
+     </ETOBJNOVER>
+     <ETOBJ_DOC>
+      <SEARCH_1/>
+      <SEARCH_2/>
+      <SEARCH_3/>
+      <SEARCH_4/>
+      <SEARCH_5/>
+      <SEARCH_6/>
+      <SEARCH_7/>
+      <SEARCH_8/>
+      <SEARCH_9/>
+      <SEARCH_10/>
+      <S_DOC_ID/>
+      <S_OBJ_ID/>
+      <S_DOC_TITL/>
+     </ETOBJ_DOC>
+     <ETOBJ_CNST>
+      <TWB_DEP_S/>
+      <TWB_DEPV_S/>
+      <TWB_DEP_L/>
+      <TWB_DEPV_L/>
+      <TWB_USE_A/>
+      <TWB_USE_P/>
+      <TWB_USE_H/>
+      <TWB_USE_E/>
+      <REUSE/>
+      <TWB_DEP_C/>
+      <TWB_DEP_VC/>
+      <TWB_DEP_F/>
+      <TWB_DEP_VF/>
+      <TWB_DEP_P/>
+      <TWB_DEP_VP/>
+      <TWB_DEP_DB/>
+      <TWB_DEPVDB/>
+      <TWB_WKREQ>0.0</TWB_WKREQ>
+      <TWB_WKUNIT>MIN</TWB_WKUNIT>
+      <TWB_PRIO>3</TWB_PRIO>
+     </ETOBJ_CNST>
+     <ETSC_TSYS>
+      <SYSTEMDATA/>
+      <TESTSYSTEM/>
+     </ETSC_TSYS>
+     <ETSYS_COMP_TABTYPE/>
+     <ETSYS_REL_TABTYPE/>
+     <ETBF_OBJ_TABTYPE/>
+     <ETBF_VER_TABTYPE/>
+    </ATTRIBUTES>
+    <PARAMETERS>
+     <ETPAR_GUIX>
+      <item>
+       <PNAME>T_LOG_CNF1</PNAME>
+       <PTYP>V</PTYP>
+       <PDESC>Logging: Configuration</PDESC>
+       <PINDEX>0005</PINDEX>
+       <XMLREF_TYP>D</XMLREF_TYP>
+       <PSTRUC_TYP>T</PSTRUC_TYP>
+       <PREF_NAME>ZIAL_TT_LOG_CNF</PREF_NAME>
+       <PDATLEN>0000</PDATLEN>
+       <PINTLEN>000000</PINTLEN>
+       <PDECIMALS>000000</PDECIMALS>
+       <SORT_LNR>0001</SORT_LNR>
+       <PREF_NAME2>ZIAL_TT_LOG_CNF</PREF_NAME2>
+       <VALUE>&lt;VALUE&gt;</VALUE>
+       <VAL_TYPE>T</VAL_TYPE>
+       <TAB_INDEX>0</TAB_INDEX>
+       <DEEP_STRU>
+        <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://xml.sap.com/2003/05/eCATT/ddic" version="1.0">
+         <xsd:complexType name="ZIAL_TT_LOG_CNF">
+          <annotation>
+           <documentation>I==O==C=T=K==D=ZIAL_TT_LOG_CNF=A=h=L=000000=doc=Logging: Configuration</documentation>
+          </annotation>
+          <sequence>
+           <element name="item" type="ZIAL_T_LOG_CNF" minOccurs="0" maxOccurs="unbounded"/>
+          </sequence>
+         </xsd:complexType>
+         <xsd:complexType name="ZIAL_T_LOG_CNF">
+          <annotation>
+           <documentation>I==O==C=S=K==D=ZIAL_T_LOG_CNF=A=u=L=000000=doc=Logging: Conf</documentation>
+          </annotation>
+          <sequence>
+           <element name="MANDT" minOccurs="0">
+            <annotation>
+             <documentation>I==O==C==K=X=D=MANDT=A=C=L=000003=doc=Client</documentation>
+            </annotation>
+            <simpleType>
+             <restriction base="string">
+              <maxLength value="3"/>
+             </restriction>
+            </simpleType>
+           </element>
+           <element name="DFLT_OBJECT" minOccurs="0">
+            <annotation>
+             <documentation>I==O==C==K=X=D=BALOBJ_D=A=C=L=000020=doc=Application log: Ob</documentation>
+            </annotation>
+            <simpleType>
+             <restriction base="string">
+              <maxLength value="20"/>
+             </restriction>
+            </simpleType>
+           </element>
+           <element name="DFLT_SUBOBJECT" minOccurs="0">
+            <annotation>
+             <documentation>I==O==C==K=X=D=BALSUBOBJ=A=C=L=000020=doc=Application Log: S</documentation>
+            </annotation>
+            <simpleType>
+             <restriction base="string">
+              <maxLength value="20"/>
+             </restriction>
+            </simpleType>
+           </element>
+          </sequence>
+         </xsd:complexType>
+        </xsd:schema>
+       </DEEP_STRU>
+       <DEEP_DATA>
+        <ddic:ZIAL_TT_LOG_CNF xmlns:ddic="http://xml.sap.com/2003/05/eCATT/ddic">
+         <item>
+          <MANDT>502</MANDT>
+          <DFLT_OBJECT>ZIAL_LOG</DFLT_OBJECT>
+          <DFLT_SUBOBJECT>LOG</DFLT_SUBOBJECT>
+         </item>
+        </ddic:ZIAL_TT_LOG_CNF>
+       </DEEP_DATA>
+      </item>
+      <item>
+       <PNAME>DFLT_OBJECT1</PNAME>
+       <PTYP>V</PTYP>
+       <PDESC>Application log: Object name (Application code)</PDESC>
+       <PINDEX>0001</PINDEX>
+       <PREF_TYPE>DTEL</PREF_TYPE>
+       <PREF_NAME>BALOBJ_D</PREF_NAME>
+       <PDOM>BALOBJ</PDOM>
+       <PDATTYP>CHAR</PDATTYP>
+       <PDATLEN>0020</PDATLEN>
+       <PINTTYP>C</PINTTYP>
+       <PINTLEN>000040</PINTLEN>
+       <PDECIMALS>000000</PDECIMALS>
+       <SORT_LNR>0002</SORT_LNR>
+       <PREF_NAME2>BALOBJ_D</PREF_NAME2>
+       <VALUE>ZIAL_LOG</VALUE>
+       <TAB_INDEX>0</TAB_INDEX>
+      </item>
+      <item>
+       <PNAME>DFLT_SUBOBJECT1</PNAME>
+       <PTYP>V</PTYP>
+       <PDESC>Application Log: Subobject</PDESC>
+       <PINDEX>0003</PINDEX>
+       <PREF_TYPE>DTEL</PREF_TYPE>
+       <PREF_NAME>BALSUBOBJ</PREF_NAME>
+       <PDOM>BALSUBOBJ</PDOM>
+       <PDATTYP>CHAR</PDATTYP>
+       <PDATLEN>0020</PDATLEN>
+       <PINTTYP>C</PINTTYP>
+       <PINTLEN>000040</PINTLEN>
+       <PDECIMALS>000000</PDECIMALS>
+       <SORT_LNR>0003</SORT_LNR>
+       <PREF_NAME2>BALSUBOBJ</PREF_NAME2>
+       <VALUE>LOG</VALUE>
+       <TAB_INDEX>0</TAB_INDEX>
+      </item>
+      <item>
+       <PNAME>T_LOG_CNF2</PNAME>
+       <PTYP>V</PTYP>
+       <PDESC>Logging: Configuration</PDESC>
+       <PINDEX>0006</PINDEX>
+       <XMLREF_TYP>D</XMLREF_TYP>
+       <PSTRUC_TYP>T</PSTRUC_TYP>
+       <PREF_NAME>ZIAL_TT_LOG_CNF</PREF_NAME>
+       <PDATLEN>0000</PDATLEN>
+       <PINTLEN>000000</PINTLEN>
+       <PDECIMALS>000000</PDECIMALS>
+       <SORT_LNR>0004</SORT_LNR>
+       <PREF_NAME2>ZIAL_TT_LOG_CNF</PREF_NAME2>
+       <VALUE>&lt;VALUE&gt;</VALUE>
+       <VAL_TYPE>T</VAL_TYPE>
+       <TAB_INDEX>0</TAB_INDEX>
+       <DEEP_STRU>
+        <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://xml.sap.com/2003/05/eCATT/ddic" version="1.0">
+         <xsd:complexType name="ZIAL_TT_LOG_CNF">
+          <annotation>
+           <documentation>I==O==C=T=K==D=ZIAL_TT_LOG_CNF=A=h=L=000000=doc=Logging: Configuration</documentation>
+          </annotation>
+          <sequence>
+           <element name="item" type="ZIAL_T_LOG_CNF" minOccurs="0" maxOccurs="unbounded"/>
+          </sequence>
+         </xsd:complexType>
+         <xsd:complexType name="ZIAL_T_LOG_CNF">
+          <annotation>
+           <documentation>I==O==C=S=K==D=ZIAL_T_LOG_CNF=A=u=L=000000=doc=Logging: Conf</documentation>
+          </annotation>
+          <sequence>
+           <element name="MANDT" minOccurs="0">
+            <annotation>
+             <documentation>I==O==C==K=X=D=MANDT=A=C=L=000003=doc=Client</documentation>
+            </annotation>
+            <simpleType>
+             <restriction base="string">
+              <maxLength value="3"/>
+             </restriction>
+            </simpleType>
+           </element>
+           <element name="DFLT_OBJECT" minOccurs="0">
+            <annotation>
+             <documentation>I==O==C==K=X=D=BALOBJ_D=A=C=L=000020=doc=Application log: Ob</documentation>
+            </annotation>
+            <simpleType>
+             <restriction base="string">
+              <maxLength value="20"/>
+             </restriction>
+            </simpleType>
+           </element>
+           <element name="DFLT_SUBOBJECT" minOccurs="0">
+            <annotation>
+             <documentation>I==O==C==K=X=D=BALSUBOBJ=A=C=L=000020=doc=Application Log: S</documentation>
+            </annotation>
+            <simpleType>
+             <restriction base="string">
+              <maxLength value="20"/>
+             </restriction>
+            </simpleType>
+           </element>
+          </sequence>
+         </xsd:complexType>
+        </xsd:schema>
+       </DEEP_STRU>
+       <DEEP_DATA>
+        <ddic:ZIAL_TT_LOG_CNF xmlns:ddic="http://xml.sap.com/2003/05/eCATT/ddic">
+         <item>
+          <MANDT>502</MANDT>
+          <DFLT_OBJECT>ABCDE</DFLT_OBJECT>
+          <DFLT_SUBOBJECT>ABCDE</DFLT_SUBOBJECT>
+         </item>
+        </ddic:ZIAL_TT_LOG_CNF>
+       </DEEP_DATA>
+      </item>
+      <item>
+       <PNAME>DFLT_OBJECT2</PNAME>
+       <PTYP>V</PTYP>
+       <PDESC>Application log: Object name (Application code)</PDESC>
+       <PINDEX>0002</PINDEX>
+       <PREF_TYPE>DTEL</PREF_TYPE>
+       <PREF_NAME>BALOBJ_D</PREF_NAME>
+       <PDOM>BALOBJ</PDOM>
+       <PDATTYP>CHAR</PDATTYP>
+       <PDATLEN>0020</PDATLEN>
+       <PINTTYP>C</PINTTYP>
+       <PINTLEN>000040</PINTLEN>
+       <PDECIMALS>000000</PDECIMALS>
+       <SORT_LNR>0005</SORT_LNR>
+       <PREF_NAME2>BALOBJ_D</PREF_NAME2>
+       <VALUE>SYSLOG</VALUE>
+       <TAB_INDEX>0</TAB_INDEX>
+      </item>
+      <item>
+       <PNAME>DFLT_SUBOBJECT2</PNAME>
+       <PTYP>V</PTYP>
+       <PDESC>Application Log: Subobject</PDESC>
+       <PINDEX>0004</PINDEX>
+       <PREF_TYPE>DTEL</PREF_TYPE>
+       <PREF_NAME>BALSUBOBJ</PREF_NAME>
+       <PDOM>BALSUBOBJ</PDOM>
+       <PDATTYP>CHAR</PDATTYP>
+       <PDATLEN>0020</PDATLEN>
+       <PINTTYP>C</PINTTYP>
+       <PINTLEN>000040</PINTLEN>
+       <PDECIMALS>000000</PDECIMALS>
+       <SORT_LNR>0006</SORT_LNR>
+       <PREF_NAME2>BALSUBOBJ</PREF_NAME2>
+       <VALUE>GENERAL</VALUE>
+       <TAB_INDEX>0</TAB_INDEX>
+      </item>
+     </ETPAR_GUIX>
+     <ETPAR_VARI/>
+    </PARAMETERS>
+    <VARIANT_MODE>
+     <ETVAR_EXT></ETVAR_EXT>
+    </VARIANT_MODE>
+   </ECTD>
+  </VERSION>
+ </VERSIONS>
+</abapGit>

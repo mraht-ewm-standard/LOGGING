@@ -1,7 +1,7 @@
 *---------------------------------------------------------------------*
-*    program for:   VIEWFRAME_ZIAL_V_LOG_CONF
+*    program for:   VIEWFRAME_ZIAL_V_LOG_ACT
 *---------------------------------------------------------------------*
-FUNCTION VIEWFRAME_ZIAL_V_LOG_CONF     .
+FUNCTION VIEWFRAME_ZIAL_V_LOG_ACT      .
 
   DATA: ENQUEUE_PROCESSED TYPE C. "flag: view enqueued by VIEWFRAME_...
 
@@ -12,15 +12,15 @@ FUNCTION VIEWFRAME_ZIAL_V_LOG_CONF     .
 *----------------------------------------------------------------------*
 * Select data from database                                            *
 *----------------------------------------------------------------------*
-CALL FUNCTION 'VIEWPROC_ZIAL_V_LOG_CONF'
+CALL FUNCTION 'VIEWPROC_ZIAL_V_LOG_ACT'
          EXPORTING
               FCODE          = READ
               VIEW_ACTION    = VIEW_ACTION
               VIEW_NAME      = VIEW_NAME
          TABLES
               EXCL_CUA_FUNCT = EXCL_CUA_FUNCT
-EXTRACT = ZIAL_V_LOG_CONF_EXTRACT
-TOTAL = ZIAL_V_LOG_CONF_TOTAL
+EXTRACT = ZIAL_V_LOG_ACT_EXTRACT
+TOTAL = ZIAL_V_LOG_ACT_TOTAL
               X_HEADER       = X_HEADER
               X_NAMTAB       = X_NAMTAB
               DBA_SELLIST    = DBA_SELLIST
@@ -44,7 +44,7 @@ TOTAL = ZIAL_V_LOG_CONF_TOTAL
 * Edit data                                                            *
 *----------------------------------------------------------------------*
       DO.
-CALL FUNCTION 'VIEWPROC_ZIAL_V_LOG_CONF'
+CALL FUNCTION 'VIEWPROC_ZIAL_V_LOG_ACT'
              EXPORTING
                   FCODE           = EDIT
                   VIEW_ACTION     = MAINT_MODE
@@ -52,11 +52,11 @@ CALL FUNCTION 'VIEWPROC_ZIAL_V_LOG_CONF'
                   CORR_NUMBER     = CORR_NUMBER
              IMPORTING
                   UCOMM           = FUNCTION
-UPDATE_REQUIRED = STATUS_ZIAL_V_LOG_CONF-UPD_FLAG
+UPDATE_REQUIRED = STATUS_ZIAL_V_LOG_ACT-UPD_FLAG
              TABLES
                   EXCL_CUA_FUNCT  = EXCL_CUA_FUNCT
-EXTRACT = ZIAL_V_LOG_CONF_EXTRACT
-TOTAL = ZIAL_V_LOG_CONF_TOTAL
+EXTRACT = ZIAL_V_LOG_ACT_EXTRACT
+TOTAL = ZIAL_V_LOG_ACT_TOTAL
                   X_HEADER        = X_HEADER
                   X_NAMTAB        = X_NAMTAB
                   DBA_SELLIST     = DBA_SELLIST
@@ -89,22 +89,22 @@ TOTAL = ZIAL_V_LOG_CONF_TOTAL
            FUNCTION EQ GET_ANOTHER_VIEW    OR
            FUNCTION EQ SWITCH_TRANSP_TO_UPD_MODE OR
            FUNCTION EQ END ) AND
-STATUS_ZIAL_V_LOG_CONF-UPD_FLAG NE SPACE.
+STATUS_ZIAL_V_LOG_ACT-UPD_FLAG NE SPACE.
         PERFORM BEENDEN.
         CASE SY-SUBRC.
           WHEN 0.
-CALL FUNCTION 'VIEWPROC_ZIAL_V_LOG_CONF'
+CALL FUNCTION 'VIEWPROC_ZIAL_V_LOG_ACT'
                   EXPORTING
                       FCODE           = SAVE
                       VIEW_ACTION     = MAINT_MODE
                       VIEW_NAME       = VIEW_NAME
                       CORR_NUMBER     = CORR_NUMBER
                   IMPORTING
-UPDATE_REQUIRED = STATUS_ZIAL_V_LOG_CONF-UPD_FLAG
+UPDATE_REQUIRED = STATUS_ZIAL_V_LOG_ACT-UPD_FLAG
                   TABLES
                       EXCL_CUA_FUNCT  = EXCL_CUA_FUNCT
-EXTRACT = ZIAL_V_LOG_CONF_EXTRACT
-TOTAL = ZIAL_V_LOG_CONF_TOTAL
+EXTRACT = ZIAL_V_LOG_ACT_EXTRACT
+TOTAL = ZIAL_V_LOG_ACT_TOTAL
                       X_HEADER        = X_HEADER
                       X_NAMTAB        = X_NAMTAB
                       DBA_SELLIST     = DBA_SELLIST
@@ -116,7 +116,7 @@ TOTAL = ZIAL_V_LOG_CONF_TOTAL
                       SAVING_CORRECTION_FAILED  = 3.
             CASE SY-SUBRC.
               WHEN 0.
-IF STATUS_ZIAL_V_LOG_CONF-UPD_FLAG EQ SPACE. EXIT. ENDIF.
+IF STATUS_ZIAL_V_LOG_ACT-UPD_FLAG EQ SPACE. EXIT. ENDIF.
               WHEN 1. RAISE MISSING_CORR_NUMBER.
               WHEN 2. RAISE NO_VALUE_FOR_SUBSET_IDENT.
               WHEN 3.
@@ -128,11 +128,11 @@ IF STATUS_ZIAL_V_LOG_CONF-UPD_FLAG EQ SPACE. EXIT. ENDIF.
 *  ...2nd: transport request                                           *
 *----------------------------------------------------------------------*
       ELSEIF FUNCTION EQ TRANSPORT.
-IF STATUS_ZIAL_V_LOG_CONF-UPD_FLAG NE SPACE.
+IF STATUS_ZIAL_V_LOG_ACT-UPD_FLAG NE SPACE.
           PERFORM TRANSPORTIEREN.
           CASE SY-SUBRC.
             WHEN 0.
-CALL FUNCTION 'VIEWPROC_ZIAL_V_LOG_CONF'
+CALL FUNCTION 'VIEWPROC_ZIAL_V_LOG_ACT'
                     EXPORTING
                         FCODE           = SAVE
                         VIEW_ACTION     = MAINT_MODE
@@ -140,11 +140,11 @@ CALL FUNCTION 'VIEWPROC_ZIAL_V_LOG_CONF'
                         CORR_NUMBER     = CORR_NUMBER
                     IMPORTING
                               UPDATE_REQUIRED =
-STATUS_ZIAL_V_LOG_CONF-UPD_FLAG
+STATUS_ZIAL_V_LOG_ACT-UPD_FLAG
                     TABLES
                         EXCL_CUA_FUNCT  = EXCL_CUA_FUNCT
-EXTRACT = ZIAL_V_LOG_CONF_EXTRACT
-TOTAL = ZIAL_V_LOG_CONF_TOTAL
+EXTRACT = ZIAL_V_LOG_ACT_EXTRACT
+TOTAL = ZIAL_V_LOG_ACT_TOTAL
                         X_HEADER        = X_HEADER
                         X_NAMTAB        = X_NAMTAB
                         DBA_SELLIST     = DBA_SELLIST
@@ -176,18 +176,18 @@ TOTAL = ZIAL_V_LOG_CONF_TOTAL
 *----------------------------------------------------------------------*
 *  Refresh selected entries from database or save data into database   *
 *----------------------------------------------------------------------*
-CALL FUNCTION 'VIEWPROC_ZIAL_V_LOG_CONF'
+CALL FUNCTION 'VIEWPROC_ZIAL_V_LOG_ACT'
              EXPORTING
                   FCODE               = FUNCTION
                   VIEW_ACTION         = MAINT_MODE
                   VIEW_NAME           = VIEW_NAME
                   CORR_NUMBER         = CORR_NUMBER
              IMPORTING
-UPDATE_REQUIRED = STATUS_ZIAL_V_LOG_CONF-UPD_FLAG
+UPDATE_REQUIRED = STATUS_ZIAL_V_LOG_ACT-UPD_FLAG
              TABLES
                   EXCL_CUA_FUNCT      = EXCL_CUA_FUNCT
-EXTRACT = ZIAL_V_LOG_CONF_EXTRACT
-TOTAL = ZIAL_V_LOG_CONF_TOTAL
+EXTRACT = ZIAL_V_LOG_ACT_EXTRACT
+TOTAL = ZIAL_V_LOG_ACT_TOTAL
                   X_HEADER            = X_HEADER
                   X_NAMTAB            = X_NAMTAB
                   DBA_SELLIST         = DBA_SELLIST

@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DD40V>
-    <TYPENAME>ZIAL_TT_LOG_CONF</TYPENAME>
+    <TYPENAME>ZIAL_TT_LOG_CNF</TYPENAME>
     <DDLANGUAGE>E</DDLANGUAGE>
-    <ROWTYPE>ZIAL_T_LOG_CONF</ROWTYPE>
+    <ROWTYPE>ZIAL_T_LOG_CNF</ROWTYPE>
     <ROWKIND>S</ROWKIND>
     <DATATYPE>STRU</DATATYPE>
     <ACCESSMODE>S</ACCESSMODE>
