@@ -98,7 +98,7 @@
        <PDATLEN>0000</PDATLEN>
        <PINTLEN>000000</PINTLEN>
        <PDECIMALS>000000</PDECIMALS>
-       <SORT_LNR>0002</SORT_LNR>
+       <SORT_LNR>0001</SORT_LNR>
        <PREF_NAME2>ZIAL_TT_LOG_ACT</PREF_NAME2>
        <VALUE>&lt;VALUE&gt;</VALUE>
        <VAL_TYPE>T</VAL_TYPE>
@@ -204,6 +204,8 @@
           <VALIDITY_PERIOD>180</VALIDITY_PERIOD>
           <LEVEL_LOG_CALLSTACK/>
          </item>
+         
+         
          <item>
           <MANDT>502</MANDT>
           <OBJECT>ZIAL_LOG</OBJECT>
@@ -213,6 +215,8 @@
           <VALIDITY_PERIOD>90</VALIDITY_PERIOD>
           <LEVEL_LOG_CALLSTACK>1</LEVEL_LOG_CALLSTACK>
          </item>
+         
+         
          <item>
           <MANDT>502</MANDT>
           <OBJECT>ZIAL_LOG</OBJECT>
@@ -222,6 +226,8 @@
           <VALIDITY_PERIOD>30</VALIDITY_PERIOD>
           <LEVEL_LOG_CALLSTACK>2</LEVEL_LOG_CALLSTACK>
          </item>
+         
+         
          <item>
           <MANDT>502</MANDT>
           <OBJECT>ZIAL_LOG</OBJECT>
@@ -231,6 +237,8 @@
           <VALIDITY_PERIOD>60</VALIDITY_PERIOD>
           <LEVEL_LOG_CALLSTACK>3</LEVEL_LOG_CALLSTACK>
          </item>
+         
+        
         </ddic:ZIAL_TT_LOG_ACT>
        </DEEP_DATA>
       </item>

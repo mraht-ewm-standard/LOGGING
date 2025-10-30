@@ -159,6 +159,8 @@
           <DFLT_OBJECT>ZIAL_LOG</DFLT_OBJECT>
           <DFLT_SUBOBJECT>LOG</DFLT_SUBOBJECT>
          </item>
+         
+        
         </ddic:ZIAL_TT_LOG_CNF>
        </DEEP_DATA>
       </item>
@@ -270,6 +272,8 @@
           <DFLT_OBJECT>ABCDE</DFLT_OBJECT>
           <DFLT_SUBOBJECT>ABCDE</DFLT_SUBOBJECT>
          </item>
+         
+        
         </ddic:ZIAL_TT_LOG_CNF>
        </DEEP_DATA>
       </item>
