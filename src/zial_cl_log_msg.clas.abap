@@ -12,8 +12,9 @@ CLASS zial_cl_log_msg DEFINITION
     "! Convert bapiret structure to message string
     "!
     "! @parameter iv_msgid   | Message ID
-    "! @parameter iv_msgty   | Message type
     "! @parameter iv_msgno   | Message number
+    "! @parameter iv_msgtx   | Message text
+    "! @parameter iv_msgty   | Message type
     "! @parameter iv_msgv1   | Message variable 1
     "! @parameter iv_msgv2   | Message variable 2
     "! @parameter iv_msgv3   | Message variable 3
@@ -22,8 +23,9 @@ CLASS zial_cl_log_msg DEFINITION
     "! @parameter rv_result  | Message as string
     CLASS-METHODS to_string
       IMPORTING iv_msgid         TYPE symsgid  DEFAULT sy-msgid
-                iv_msgty         TYPE symsgty  DEFAULT sy-msgty
                 iv_msgno         TYPE symsgno  DEFAULT sy-msgno
+                iv_msgtx         TYPE bapi_msg OPTIONAL
+                iv_msgty         TYPE symsgty  DEFAULT sy-msgty
                 iv_msgv1         TYPE symsgv   DEFAULT sy-msgv1
                 iv_msgv2         TYPE symsgv   DEFAULT sy-msgv2
                 iv_msgv3         TYPE symsgv   DEFAULT sy-msgv3
@@ -33,9 +35,9 @@ CLASS zial_cl_log_msg DEFINITION
 
     CLASS-METHODS to_symsg
       IMPORTING iv_msgid        TYPE symsgid  DEFAULT sy-msgid
-                iv_msgty        TYPE symsgty  DEFAULT sy-msgty
-                iv_msgno        TYPE symsgno  DEFAULT sy-msgno
                 iv_msgtx        TYPE bapi_msg OPTIONAL
+                iv_msgno        TYPE symsgno  DEFAULT sy-msgno
+                iv_msgty        TYPE symsgty  DEFAULT sy-msgty
                 iv_msgv1        TYPE symsgv   DEFAULT sy-msgv1
                 iv_msgv2        TYPE symsgv   DEFAULT sy-msgv2
                 iv_msgv3        TYPE symsgv   DEFAULT sy-msgv3
@@ -90,6 +92,7 @@ CLASS zial_cl_log_msg IMPLEMENTATION.
 
     DATA(ls_symsg) = to_symsg( iv_msgid   = iv_msgid
                                iv_msgno   = iv_msgno
+                               iv_msgtx   = iv_msgtx
                                iv_msgty   = iv_msgty
                                iv_msgv1   = iv_msgv1
                                iv_msgv2   = iv_msgv2
@@ -121,7 +124,14 @@ CLASS zial_cl_log_msg IMPLEMENTATION.
   ENDMETHOD.
 
 
-    METHOD harmonize_msg.
+  METHOD harmonize_msg.
+
+    TYPES: BEGIN OF s_msgtx,
+             part1 TYPE symsgv,
+             part2 TYPE symsgv,
+             part3 TYPE symsgv,
+             part4 TYPE symsgv,
+           END OF s_msgtx.
 
     CLEAR: ev_msgtx,
            es_symsg.
@@ -137,12 +147,20 @@ CLASS zial_cl_log_msg IMPLEMENTATION.
       DATA(lv_msgv3) = is_bapiret-message_v3.
       DATA(lv_msgv4) = is_bapiret-message_v4.
 
+    ELSEIF iv_msgtx IS NOT INITIAL.
+
+      lv_msgtx = iv_msgtx.
+      lv_msgty = iv_msgty.
+      lv_msgv1 = iv_msgv1.
+      lv_msgv2 = iv_msgv2.
+      lv_msgv3 = iv_msgv3.
+      lv_msgv4 = iv_msgv4.
+
     ELSE.
 
       lv_msgid = iv_msgid.
       lv_msgno = iv_msgno.
       lv_msgty = iv_msgty.
-      lv_msgtx = iv_msgtx.
       lv_msgv1 = iv_msgv1.
       lv_msgv2 = iv_msgv2.
       lv_msgv3 = iv_msgv3.
@@ -178,11 +196,16 @@ CLASS zial_cl_log_msg IMPLEMENTATION.
 
     ENDWHILE.
 
+    IF lv_msgtx IS NOT INITIAL.
+      DATA(ls_msgtx) = CONV s_msgtx( lv_msgtx ).
+      lv_msgv1 = ls_msgtx-part1.
+      lv_msgv2 = ls_msgtx-part2.
+      lv_msgv3 = ls_msgtx-part3.
+      lv_msgv4 = ls_msgtx-part4.
+    ENDIF.
+
     MESSAGE ID lv_msgid TYPE lv_msgty NUMBER lv_msgno
             WITH lv_msgv1 lv_msgv2 lv_msgv3 lv_msgv4 INTO ev_msgtx.
-    IF ev_msgtx IS INITIAL.
-      ev_msgtx = lv_msgtx.
-    ENDIF.
 
     es_symsg = VALUE #( msgid = lv_msgid
                         msgno = lv_msgno
