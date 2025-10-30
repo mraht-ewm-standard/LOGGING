@@ -1,14 +1,14 @@
 *---------------------------------------------------------------------*
-*    program for:   VIEWPROC_ZIAL_V_LOG_CONF
+*    program for:   VIEWPROC_ZIAL_V_LOG_ACT
 *---------------------------------------------------------------------*
-FUNCTION VIEWPROC_ZIAL_V_LOG_CONF      .
+FUNCTION VIEWPROC_ZIAL_V_LOG_ACT       .
 *----------------------------------------------------------------------*
 * Initialization: set field-symbols etc.                               *
 *----------------------------------------------------------------------*
    IF LAST_VIEW_INFO NE VIEW_NAME.
-ASSIGN ZIAL_V_LOG_CONF TO <TABLE1>.
-ASSIGN *ZIAL_V_LOG_CONF TO <INITIAL>.
-ASSIGN STATUS_ZIAL_V_LOG_CONF TO <STATUS>.
+ASSIGN ZIAL_V_LOG_ACT TO <TABLE1>.
+ASSIGN *ZIAL_V_LOG_ACT TO <INITIAL>.
+ASSIGN STATUS_ZIAL_V_LOG_ACT TO <STATUS>.
      PERFORM INITIALISIEREN.
    ENDIF.
    PERFORM JUSTIFY_ACTION_MODE.
@@ -23,7 +23,7 @@ ASSIGN STATUS_ZIAL_V_LOG_CONF TO <STATUS>.
     IF X_HEADER-FRM_RP_GET NE SPACE.
             PERFORM (X_HEADER-FRM_RP_GET) IN PROGRAM.
     ELSE.
-PERFORM GET_DATA_ZIAL_V_LOG_CONF.
+PERFORM GET_DATA_ZIAL_V_LOG_ACT.
     ENDIF.
     IF FCODE EQ READ_AND_EDIT. FCODE = EDIT. ENDIF.
   ENDIF.
@@ -41,7 +41,7 @@ PERFORM GET_DATA_ZIAL_V_LOG_CONF.
           PERFORM (X_HEADER-FRM_RP_UPD) IN PROGRAM.
         ELSE.
           IF SY-SUBRC EQ 0.
-PERFORM DB_UPD_ZIAL_V_LOG_CONF.
+PERFORM DB_UPD_ZIAL_V_LOG_ACT.
           ENDIF.
         ENDIF.
         PERFORM AFTER_SAVING.
@@ -56,5 +56,5 @@ PERFORM DB_UPD_ZIAL_V_LOG_CONF.
       PERFORM RESET_ENTRIES USING DETAIL_BILD.
 *.......................................................................
   ENDCASE.
-MOVE STATUS_ZIAL_V_LOG_CONF-UPD_FLAG TO UPDATE_REQUIRED.
+MOVE STATUS_ZIAL_V_LOG_ACT-UPD_FLAG TO UPDATE_REQUIRED.
 ENDFUNCTION.

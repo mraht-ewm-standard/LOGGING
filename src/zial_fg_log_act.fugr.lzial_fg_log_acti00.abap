@@ -1,10 +1,10 @@
 *---------------------------------------------------------------------*
 *    view related PAI modules
 *---------------------------------------------------------------------*
-*...processing: ZIAL_V_LOG_CONF.................................*
+*...processing: ZIAL_V_LOG_ACT..................................*
 *---------------------------------------------------------------------*
-* MODULE COMPLETE_ZIAL_V_LOG_CONF
+* MODULE COMPLETE_ZIAL_V_LOG_ACT
 *---------------------------------------------------------------------*
-MODULE COMPLETE_ZIAL_V_LOG_CONF.
+MODULE COMPLETE_ZIAL_V_LOG_ACT.
 PERFORM COMPLETE_EXPROFIELDS.
 ENDMODULE.

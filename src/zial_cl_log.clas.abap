@@ -40,11 +40,6 @@ CLASS zial_cl_log DEFINITION
                  undef   TYPE zial_de_log_detail_level VALUE 9,
                END OF mc_detail_level.
 
-    CONSTANTS: BEGIN OF mc_default,
-                 log_object    TYPE balobj_d  VALUE 'SYSLOG' ##NO_TEXT,  " Adjust to your needs
-                 log_subobject TYPE balsubobj VALUE 'GENERAL' ##NO_TEXT,
-               END OF mc_default.
-
     CONSTANTS: BEGIN OF mc_msgty,
                  any_error TYPE char3   VALUE 'EAX',
                  error     TYPE symsgty VALUE 'E',
@@ -74,8 +69,8 @@ CLASS zial_cl_log DEFINITION
     "! @parameter it_extnumber | External number elements
     "! @parameter ro_instance  | Log instance
     CLASS-METHODS create
-      IMPORTING iv_object          TYPE balobj_d  DEFAULT mc_default-log_object
-                iv_subobject       TYPE balsubobj DEFAULT mc_default-log_subobject
+      IMPORTING iv_object          TYPE balobj_d  OPTIONAL
+                iv_subobject       TYPE balsubobj OPTIONAL
                 iv_extnumber       TYPE balnrext  OPTIONAL
                 it_extnumber       TYPE stringtab OPTIONAL
       RETURNING VALUE(ro_instance) TYPE zial_cl_log_const=>r_log_instance.
@@ -216,7 +211,7 @@ CLASS zial_cl_log DEFINITION
     CLASS-DATA mv_log_part_id           TYPE i.
     CLASS-DATA ms_symsg                 TYPE symsg.
 
-    CLASS-DATA mo_instance              TYPE zial_cl_log_const=>r_log_instance.
+    CLASS-DATA mo_instance TYPE zial_cl_log_const=>r_log_instance.
 
     CLASS-METHODS harmonize_msg
       IMPORTING iv_msgid   TYPE symsgid
@@ -313,9 +308,8 @@ CLASS zial_cl_log IMPLEMENTATION.
 
     mo_instance = zial_cl_log_stack=>pop( )-instance.
     IF mo_instance IS INITIAL.
-      mo_instance = create( iv_object    = mc_default-log_object
-                            iv_subobject = mc_default-log_subobject
-                            iv_extnumber = CONV #( TEXT-001 ) ).
+      mo_instance = create( iv_extnumber = CONV #( TEXT-001 ) ).
+      mo_instance->mv_is_fallback_log = abap_true.
     ENDIF.
 
     ro_instance = mo_instance.
@@ -377,6 +371,7 @@ CLASS zial_cl_log IMPLEMENTATION.
     ENDLOOP.
 
   ENDMETHOD.
+
 
   METHOD recover_sy_msg.
 
