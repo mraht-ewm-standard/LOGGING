@@ -267,6 +267,8 @@
           <DFLT_OBJECT>SYSLOG</DFLT_OBJECT>
           <DFLT_SUBOBJECT>GENERAL</DFLT_SUBOBJECT>
          </item>
+         
+        
         </ddic:ZIAL_TT_LOG_CNF>
        </DEEP_DATA>
       </item>
