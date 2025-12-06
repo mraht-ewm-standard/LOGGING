@@ -2,6 +2,8 @@
 INTERFACE zial_if_log_sap
   PUBLIC.
 
+  TYPES r_log_instance TYPE REF TO zial_cl_log_sap.
+
   "! <strong>[SAP]</strong> Get handle of log
   "!
   "! @parameter rv_log_handle | Log handle

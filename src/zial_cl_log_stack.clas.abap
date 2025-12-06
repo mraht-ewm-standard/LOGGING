@@ -5,7 +5,7 @@ CLASS zial_cl_log_stack DEFINITION
   PUBLIC SECTION.
     TYPES: BEGIN OF s_log_stack,
              log_handle TYPE balloghndl,
-             instance   TYPE zial_cl_log_const=>r_log_instance,
+             instance   TYPE zial_if_log_sap=>r_log_instance,
            END OF s_log_stack.
     TYPES t_log_stack TYPE SORTED TABLE OF s_log_stack WITH UNIQUE KEY log_handle.
 
@@ -15,7 +15,7 @@ CLASS zial_cl_log_stack DEFINITION
       IMPORTING iv_log_handle TYPE balloghndl.
 
     CLASS-METHODS push
-      IMPORTING io_instance TYPE zial_cl_log_const=>r_log_instance.
+      IMPORTING io_instance TYPE zial_if_log_sap=>r_log_instance.
 
     CLASS-METHODS pop
       RETURNING VALUE(rs_log_stack) TYPE s_log_stack.
@@ -30,40 +30,24 @@ ENDCLASS.
 
 
 CLASS zial_cl_log_stack IMPLEMENTATION.
-
   METHOD remove.
-
-    DELETE mt_log_stack WHERE log_handle EQ iv_log_handle.
-
+    DELETE mt_log_stack WHERE log_handle = iv_log_handle.
   ENDMETHOD.
-
 
   METHOD push.
-
     INSERT VALUE #( log_handle = io_instance->get_log_handle( )
                     instance   = io_instance ) INTO TABLE mt_log_stack.
-
   ENDMETHOD.
-
 
   METHOD pop.
-
     rs_log_stack = VALUE #( mt_log_stack[ 1 ] OPTIONAL ).
-
   ENDMETHOD.
-
 
   METHOD is_empty.
-
     rv_result = xsdbool( mt_log_stack IS INITIAL ).
-
   ENDMETHOD.
-
 
   METHOD free.
-
     FREE mt_log_stack.
-
   ENDMETHOD.
-
 ENDCLASS.
