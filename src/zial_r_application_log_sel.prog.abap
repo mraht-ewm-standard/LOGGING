@@ -41,5 +41,3 @@ SELECTION-SCREEN BEGIN OF BLOCK b5 WITH FRAME TITLE TEXT-005.
                   s_msgno FOR sy-msgno,
                   s_msgv  FOR sy-msgv1.
 SELECTION-SCREEN END OF BLOCK b5.
-
-PARAMETERS p_appl AS CHECKBOX DEFAULT 'X'.
