@@ -145,13 +145,16 @@ CLASS zial_cl_log DEFINITION
       RETURNING VALUE(rs_symsg) TYPE symsg.
 
     CLASS-METHODS show_msgtx
-      IMPORTING iv_msgty TYPE msgty DEFAULT 'S'
-                iv_msgtx TYPE msgtx
-                iv_msgv1 TYPE msgv1 OPTIONAL
-                iv_msgv2 TYPE msgv2 OPTIONAL
-                iv_msgv3 TYPE msgv3 OPTIONAL
-                iv_msgv4 TYPE msgv4 OPTIONAL
-                iv_msgdl TYPE msgty OPTIONAL.
+      IMPORTING iv_msgid     TYPE symsgid        DEFAULT sy-msgid
+                iv_msgty     TYPE symsgty        DEFAULT sy-msgty
+                iv_msgdl     TYPE msgty          OPTIONAL
+                iv_msgno     TYPE symsgno        DEFAULT sy-msgno
+                iv_msgtx     TYPE clike          OPTIONAL
+                iv_msgv1     TYPE clike          DEFAULT sy-msgv1
+                iv_msgv2     TYPE clike          DEFAULT sy-msgv2
+                iv_msgv3     TYPE clike          DEFAULT sy-msgv3
+                iv_msgv4     TYPE clike          DEFAULT sy-msgv4
+                io_exception TYPE REF TO cx_root OPTIONAL.
 
     "! Convert data dynamically into message details
     "! <p><strong>Note:</strong><br/>If you supply an element-wise table you'll have to provide
@@ -402,26 +405,23 @@ CLASS zial_cl_log IMPLEMENTATION.
 
   METHOD show_msgtx.
 
+    DATA(ls_bapiret) = to_bapiret( iv_msgid     = iv_msgid
+                                   iv_msgno     = iv_msgno
+                                   iv_msgty     = iv_msgty
+                                   iv_msgtx     = iv_msgtx
+                                   iv_msgv1     = iv_msgv1
+                                   iv_msgv2     = iv_msgv2
+                                   iv_msgv3     = iv_msgv3
+                                   iv_msgv4     = iv_msgv4
+                                   io_exception = io_exception ).
+
     DATA(lv_msgdl) = iv_msgdl.
     IF lv_msgdl IS INITIAL.
       lv_msgdl = iv_msgty.
     ENDIF.
 
-    DATA(lv_msgtx) = iv_msgtx.
-    IF iv_msgv1 IS NOT INITIAL.
-      REPLACE '&1' IN lv_msgtx WITH iv_msgv1.
-    ENDIF.
-    IF iv_msgv2 IS NOT INITIAL.
-      REPLACE '&2' IN lv_msgtx WITH iv_msgv2.
-    ENDIF.
-    IF iv_msgv3 IS NOT INITIAL.
-      REPLACE '&3' IN lv_msgtx WITH iv_msgv3.
-    ENDIF.
-    IF iv_msgv4 IS NOT INITIAL.
-      REPLACE '&4' IN lv_msgtx WITH iv_msgv4.
-    ENDIF.
-
-    MESSAGE lv_msgtx TYPE iv_msgty DISPLAY LIKE lv_msgdl.
+    MESSAGE ID ls_bapiret-id TYPE ls_bapiret-type NUMBER ls_bapiret-number DISPLAY LIKE lv_msgdl
+            WITH ls_bapiret-message_v1 ls_bapiret-message_v2 ls_bapiret-message_v3 ls_bapiret-message_v4.
 
   ENDMETHOD.
 

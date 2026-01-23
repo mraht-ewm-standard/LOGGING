@@ -30,24 +30,40 @@ ENDCLASS.
 
 
 CLASS zial_cl_log_stack IMPLEMENTATION.
+
   METHOD remove.
-    DELETE mt_log_stack WHERE log_handle = iv_log_handle.
+
+    DELETE mt_log_stack WHERE log_handle EQ iv_log_handle.
+
   ENDMETHOD.
+
 
   METHOD push.
+
     INSERT VALUE #( log_handle = io_instance->get_log_handle( )
                     instance   = io_instance ) INTO TABLE mt_log_stack.
+
   ENDMETHOD.
+
 
   METHOD pop.
+
     rs_log_stack = VALUE #( mt_log_stack[ 1 ] OPTIONAL ).
+
   ENDMETHOD.
+
 
   METHOD is_empty.
+
     rv_result = xsdbool( mt_log_stack IS INITIAL ).
+
   ENDMETHOD.
 
+
   METHOD free.
+
     FREE mt_log_stack.
+
   ENDMETHOD.
+
 ENDCLASS.
