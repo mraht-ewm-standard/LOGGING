@@ -226,13 +226,9 @@ CLASS lcl_application IMPLEMENTATION.
     DATA(ls_profile) = build_display_profile( ).
     DATA(lt_log_handle) = VALUE bal_t_logh( FOR <s_header_data> IN lt_header_data
                                             ( <s_header_data>-log_handle ) ).
-
-    IF p_appl EQ abap_false.
-      DATA(ls_msg_filter) = VALUE bal_s_mfil( msgid = s_msgid[]
-                                              msgno = s_msgno[]
-                                              msgty = s_msgty[] ).
-    ENDIF.
-
+    DATA(ls_msg_filter) = VALUE bal_s_mfil( msgid = s_msgid[]
+                                            msgno = s_msgno[]
+                                            msgty = s_msgty[] ).
     CALL FUNCTION 'BAL_DSP_LOG_DISPLAY'
       EXPORTING  i_s_display_profile = ls_profile
                  i_t_log_handle      = lt_log_handle
