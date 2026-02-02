@@ -216,7 +216,7 @@ CLASS zial_cl_log DEFINITION
     CLASS-DATA mv_log_part_id           TYPE i.
     CLASS-DATA ms_symsg                 TYPE symsg.
 
-    CLASS-DATA mo_instance              TYPE zial_if_log_sap=>r_log_instance.
+    CLASS-DATA mo_instance TYPE zial_if_log_sap=>r_log_instance.
 
     CLASS-METHODS harmonize_msg
       IMPORTING iv_msgid   TYPE symsgid

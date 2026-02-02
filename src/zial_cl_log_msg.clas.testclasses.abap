@@ -65,7 +65,7 @@ CLASS ltc_log_msg IMPLEMENTATION.
 
   METHOD t0001.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     MESSAGE s499(sy) WITH 'LGNUM' 'HUID' 'RSRC' 'NLPLA' INTO DATA(lv_exp_msgtx) ##NEEDED.
     DATA(lv_msgtx) = zial_cl_log_msg=>to_string( ).
@@ -78,7 +78,7 @@ CLASS ltc_log_msg IMPLEMENTATION.
 
   METHOD t0002.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     DATA(ls_exp_message) = zial_cl_log_msg=>to_bapiret( iv_msgtx = |&1 &2 &3 &4|
                                                         iv_msgv1 = 'LGNUM'
@@ -92,7 +92,7 @@ CLASS ltc_log_msg IMPLEMENTATION.
 
   METHOD t0003.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     DATA(lv_msgtx) = zial_cl_log_msg=>to_string( iv_msgtx = 'Test: &1 &2 &3 &4'
                                                  iv_msgv1 = 'LGNUM'

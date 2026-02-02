@@ -70,7 +70,7 @@ CLASS ltc_log IMPLEMENTATION.
 
   METHOD t0001.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     zial_cl_log=>get( )->log_message( iv_msgty = zial_cl_log=>mc_msgty-info
                                       iv_msgtx = |LOG_INFO| ).
@@ -84,7 +84,7 @@ CLASS ltc_log IMPLEMENTATION.
 
   METHOD t0002.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     zial_cl_log=>get( )->log_message( iv_msgty = zial_cl_log=>mc_msgty-info
                                       iv_msgtx = |LOG_INFO| ).
@@ -104,7 +104,7 @@ CLASS ltc_log IMPLEMENTATION.
 
   METHOD t0003.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     MESSAGE s499(sy) WITH 'LGNUM' 'HUID' 'RSRC' 'NLPLA' INTO DATA(lv_exp_msgtx) ##NEEDED.
     DATA(lt_exp_messages) = zial_cl_log=>to_bapirets( ).
@@ -119,7 +119,7 @@ CLASS ltc_log IMPLEMENTATION.
 
   METHOD t0004.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     MESSAGE s499(sy) WITH 'LGNUM' 'HUID' 'RSRC' 'NLPLA' INTO DATA(lv_exp_msgtx) ##NEEDED.
     zial_cl_log=>get( )->log_message( it_msgde = VALUE #( ( fnam = 'TEST' low = '1234' ) ) ).
@@ -133,7 +133,7 @@ CLASS ltc_log IMPLEMENTATION.
 
   METHOD t0005.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     DATA(lv_act_components) = zial_cl_log=>get_components_from_msgde( VALUE #( ( fnam = 'LGNUM' )
                                                                                ( fnam = 'HUID' )

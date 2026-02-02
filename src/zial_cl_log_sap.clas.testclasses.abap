@@ -76,7 +76,7 @@ CLASS ltc_log IMPLEMENTATION.
 
   METHOD t0001.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     CLEAR: sy-msgty,
            sy-msgid,
@@ -99,7 +99,7 @@ CLASS ltc_log IMPLEMENTATION.
 
     " No input => configured default
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     DATA(lo_log) = zial_cl_log=>create( ).
     DATA(ls_log_hdr) = lo_log->get_log_hdr( ).
@@ -117,7 +117,7 @@ CLASS ltc_log IMPLEMENTATION.
 
     " Valid input => input
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     DATA(lo_log) = zial_cl_log=>create( iv_object    = ms_tdc_data-log_object2
                                         iv_subobject = ms_tdc_data-log_subobject2 ).
@@ -136,7 +136,7 @@ CLASS ltc_log IMPLEMENTATION.
 
     " Invalid input => configured default
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     DATA(lo_log) = zial_cl_log=>create( iv_object    = ms_tdc_data-log_object3
                                         iv_subobject = ms_tdc_data-log_subobject3 ).
