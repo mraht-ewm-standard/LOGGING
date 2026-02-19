@@ -208,6 +208,8 @@
          
          
          
+         
+         
          <item>
           <MANDT>502</MANDT>
           <OBJECT>ZIAL_LOG</OBJECT>
@@ -217,6 +219,8 @@
           <VALIDITY_PERIOD>90</VALIDITY_PERIOD>
           <LEVEL_LOG_CALLSTACK>1</LEVEL_LOG_CALLSTACK>
          </item>
+         
+         
          
          
          
@@ -234,6 +238,8 @@
          
          
          
+         
+         
          <item>
           <MANDT>502</MANDT>
           <OBJECT>ZIAL_LOG</OBJECT>
@@ -245,6 +251,8 @@
          </item>
          
          
+         
+        
         
         
         </ddic:ZIAL_TT_LOG_ACT>
