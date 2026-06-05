@@ -41,12 +41,11 @@ CLASS ltc_log IMPLEMENTATION.
 
   METHOD class_setup.
 
-    mo_aunit = zial_cl_aunit=>on_class_setup(
-                   iv_tdc_cnt    = mc_tdc_cnt
-                   iv_ign_errors = abap_true
-                   ir_tdc_data   = REF #( ms_tdc_data )
-                   it_sql_data   = VALUE #( ( tbl_name = 'ZIAL_T_LOG_CNF'
-                                              tbl_data = REF #( ms_tdc_data-t_log_cnf ) ) ) ).
+    mo_aunit = zial_cl_aunit=>on_class_setup( iv_tdc_cnt    = mc_tdc_cnt
+                                              iv_ign_errors = abap_true
+                                              ir_tdc_data   = REF #( ms_tdc_data )
+                                              it_sql_data   = VALUE #( ( tbl_name = 'ZIAL_T_LOG_CNF'
+                                                                         tbl_data = REF #( ms_tdc_data-t_log_cnf ) ) ) ).
 
   ENDMETHOD.
 
@@ -76,7 +75,7 @@ CLASS ltc_log IMPLEMENTATION.
 
   METHOD t0001.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     CLEAR: sy-msgty,
            sy-msgid,
@@ -99,7 +98,7 @@ CLASS ltc_log IMPLEMENTATION.
 
     " No input => configured default
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     DATA(lo_log) = zial_cl_log=>create( ).
     DATA(ls_log_hdr) = lo_log->get_log_hdr( ).
@@ -117,7 +116,7 @@ CLASS ltc_log IMPLEMENTATION.
 
     " Valid input => input
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     DATA(lo_log) = zial_cl_log=>create( iv_object    = ms_tdc_data-log_object2
                                         iv_subobject = ms_tdc_data-log_subobject2 ).
@@ -136,7 +135,7 @@ CLASS ltc_log IMPLEMENTATION.
 
     " Invalid input => configured default
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     DATA(lo_log) = zial_cl_log=>create( iv_object    = ms_tdc_data-log_object3
                                         iv_subobject = ms_tdc_data-log_subobject3 ).

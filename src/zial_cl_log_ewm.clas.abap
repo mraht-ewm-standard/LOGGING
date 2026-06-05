@@ -25,7 +25,7 @@ CLASS zial_cl_log_ewm DEFINITION
     CLASS-METHODS to_bapiret
       IMPORTING it_dm_messages       TYPE /scdl/dm_message_tab OPTIONAL
                 it_wm_messages       TYPE /scwm/t_messages     OPTIONAL
-      RETURNING VALUE(rt_bapirettab) TYPE bapirettab.
+      RETURNING VALUE(rt_bapirettab) TYPE bapiret2_t.
 
     METHODS set_expiry_date REDEFINITION.
 
@@ -156,14 +156,16 @@ CLASS zial_cl_log_ewm IMPLEMENTATION.
                                                               message_v2 = msgv2
                                                               message_v3 = msgv3
                                                               message_v4 = msgv4 ).
-    ELSEIF it_wm_messages IS SUPPLIED.
-      rt_bapirettab = CORRESPONDING #( it_wm_messages MAPPING id         = msgid
+    ENDIF.
+
+    IF it_wm_messages IS SUPPLIED.
+      INSERT LINES OF CORRESPONDING bapiret2_t( it_wm_messages MAPPING id = msgid
                                                               type       = msgty
                                                               number     = msgno
                                                               message_v1 = msgv1
                                                               message_v2 = msgv2
                                                               message_v3 = msgv3
-                                                              message_v4 = msgv4 ).
+                                                              message_v4 = msgv4 ) INTO TABLE rt_bapirettab.
     ENDIF.
 
   ENDMETHOD.

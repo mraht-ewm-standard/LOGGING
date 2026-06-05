@@ -69,7 +69,7 @@ CLASS ltc_log_cnf IMPLEMENTATION.
 
   METHOD t0001.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     mo_aunit->set_sql_data( VALUE #( ( tbl_name = 'ZIAL_T_LOG_CNF'
                                        tbl_data = REF #( ms_tdc_data-t_log_cnf1 ) ) ) ).
@@ -88,7 +88,7 @@ CLASS ltc_log_cnf IMPLEMENTATION.
 
   METHOD t0002.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     mo_aunit->set_sql_data( VALUE #( ( tbl_name = 'ZIAL_T_LOG_CNF'
                                        tbl_data = REF #( ms_tdc_data-t_log_cnf2 ) ) ) ).

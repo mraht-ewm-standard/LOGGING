@@ -70,7 +70,7 @@ CLASS ltc_log_ewm IMPLEMENTATION.
 
   METHOD t0001.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     MESSAGE s499(sy) WITH 'LGNUM' 'HUID' 'RSRC' 'NLPLA' INTO DATA(lv_exp_msgtx) ##NEEDED.
     DATA(ls_exp_message) = zial_cl_log=>to_bapiret( ).
@@ -98,7 +98,7 @@ CLASS ltc_log_ewm IMPLEMENTATION.
 
   METHOD t0002.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     " IT_DATA as element with FNAM
     DATA(lt_lgpla) = VALUE /scwm/tt_lgpla( ( 'TEST1' )
@@ -163,7 +163,7 @@ CLASS ltc_log_ewm IMPLEMENTATION.
 
   METHOD t0003.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     DATA(lo_cl_log) = NEW /scwm/cl_log( ).
     zial_cl_log=>get( )->log_saplog( lo_cl_log ).
@@ -173,7 +173,7 @@ CLASS ltc_log_ewm IMPLEMENTATION.
 
   METHOD t0004.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     DATA(lo_api_message) = NEW /scwm/cl_api_message( ).
     zial_cl_log=>get( )->log_api_message( lo_api_message ).
@@ -183,7 +183,7 @@ CLASS ltc_log_ewm IMPLEMENTATION.
 
   METHOD t0005.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     DATA(lt_dm_messages) = VALUE /scdl/dm_message_tab( ).
     zial_cl_log=>get( )->log_dm_messages( lt_dm_messages ).

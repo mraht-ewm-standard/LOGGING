@@ -12,8 +12,8 @@ CLASS ltc_log_act DEFINITION FINAL
 
     CONSTANTS mc_tdc_cnt TYPE etobj_name VALUE 'ZIAL_TDC_LOG_ACT'.
 
-    CLASS-DATA mo_aunit    TYPE REF TO zial_cl_aunit.
-    CLASS-DATA ms_tdc_data TYPE s_tdc_data.
+    CLASS-DATA mo_aunit                 TYPE REF TO zial_cl_aunit.
+    CLASS-DATA ms_tdc_data              TYPE s_tdc_data.
 
     CLASS-DATA mo_osql_test_environment TYPE REF TO if_osql_test_environment.
 
@@ -66,7 +66,7 @@ CLASS ltc_log_act IMPLEMENTATION.
 
   METHOD t0001.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     LOOP AT ms_tdc_data-t_log_act ASSIGNING FIELD-SYMBOL(<ls_log_act_exp>).
 
@@ -84,7 +84,7 @@ CLASS ltc_log_act IMPLEMENTATION.
 
   METHOD t0002.
 
-    CHECK mo_aunit->active( abap_true ).
+    CHECK mo_aunit->is_active( abap_true ).
 
     DATA(ls_log_act_act) = zial_cl_log_act=>get( iv_object    = space
                                                  iv_subobject = space
