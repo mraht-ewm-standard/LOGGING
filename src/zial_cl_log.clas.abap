@@ -5,6 +5,8 @@ CLASS zial_cl_log DEFINITION
   GLOBAL FRIENDS zial_cl_log_sap.
 
   PUBLIC SECTION.
+    INTERFACES zial_if_class_descr.
+
     TYPES de_message_param_id TYPE n LENGTH 10.
     TYPES de_input_component  TYPE c LENGTH 150.
 
@@ -28,7 +30,7 @@ CLASS zial_cl_log DEFINITION
                END OF mc_log_process.
 
     CONSTANTS: BEGIN OF mc_validity_period,
-                 undef TYPE zial_de_log_validity_period VALUE -1,
+                 undef TYPE zial_de_log_validity_period VALUE 0,
                END OF mc_validity_period.
 
     CONSTANTS: BEGIN OF mc_detail_level,
@@ -603,6 +605,21 @@ CLASS zial_cl_log IMPLEMENTATION.
                                               iv_msgv4   = iv_msgv4
                                               is_bapiret = is_bapiret
                                     IMPORTING es_symsg   = rs_symsg ).
+
+  ENDMETHOD.
+
+
+  METHOD zial_if_class_descr~get_own_class_name.
+
+    rv_class_name = zial_cl_clas=>get_name_by_object( io_object = NEW zial_cl_log( ) ).
+
+  ENDMETHOD.
+
+
+  METHOD zial_if_class_descr~implements_method.
+
+    rv_result = zial_cl_clas=>implements_method_by_object( io_object      = NEW zial_cl_log( )
+                                                           iv_method_name = iv_method_name ).
 
   ENDMETHOD.
 
