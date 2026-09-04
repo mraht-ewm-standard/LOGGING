@@ -15,6 +15,7 @@ CLASS zial_cl_log_sap DEFINITION
     ALIASES log_bapiret             FOR zial_if_log_sap~log_bapiret.
     ALIASES log_line                FOR zial_if_log_sap~log_line.
     ALIASES log_caller              FOR zial_if_log_sap~log_caller.
+    ALIASES log_attr                FOR zdgl_if_log_sap~log_attr.
     ALIASES has_error               FOR zial_if_log_sap~has_error.
     ALIASES save                    FOR zial_if_log_sap~save.
     ALIASES set_extnumber           FOR zial_if_log_sap~set_extnumber.
@@ -810,6 +811,34 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
                    iv_msgv3 = <ls_symsg>-msgv3
                    iv_msgv4 = <ls_symsg>-msgv4 ).
     ENDLOOP.
+
+  ENDMETHOD.
+
+
+  METHOD log_attr.
+
+    DATA(lt_msgde) = VALUE rsra_t_alert_definition( ).
+    LOOP AT it_attr ASSIGNING FIELD-SYMBOL(<ls_attr>).
+      INSERT VALUE #( fnam = <ls_attr>-name
+                      low  = <ls_attr>-value ) INTO TABLE lt_msgde.
+    ENDLOOP.
+
+    IF     iv_msgid IS INITIAL
+       AND iv_msgno IS INITIAL
+       AND iv_msgtx IS INITIAL.
+      log_message( iv_msgtx = TEXT-003
+                   it_msgde = lt_msgde ).
+    ELSE.
+      log_message( iv_msgty = iv_msgty
+                   iv_msgtx = iv_msgtx
+                   iv_msgid = iv_msgid
+                   iv_msgno = iv_msgno
+                   iv_msgv1 = iv_msgv1
+                   iv_msgv2 = iv_msgv2
+                   iv_msgv3 = iv_msgv3
+                   iv_msgv4 = iv_msgv4
+                   it_msgde = lt_msgde ).
+    ENDIF.
 
   ENDMETHOD.
 
