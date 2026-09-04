@@ -64,6 +64,28 @@ INTERFACE zial_if_log_sap
   "! <strong>[SAP]</strong> Log name of development object which called the function to be logged
   METHODS log_caller.
 
+  "! <strong>[SAP]</strong> Log list of attributes
+  "!
+  "! @parameter iv_msgty | Message type
+  "! @parameter iv_msgtx | Message text
+  "! @parameter iv_msgid | Message ID
+  "! @parameter iv_msgno | Message number
+  "! @parameter iv_msgv1 | Message variable 1
+  "! @parameter iv_msgv2 | Message variable 2
+  "! @parameter iv_msgv3 | Message variable 3
+  "! @parameter iv_msgv4 | Message variable 4
+  "! @parameter it_attr  | List of attributes
+  METHODS log_attr
+    IMPORTING iv_msgty TYPE symsgty  DEFAULT sy-msgty
+              iv_msgtx TYPE bapi_msg OPTIONAL
+              iv_msgid TYPE symsgid  DEFAULT sy-msgid
+              iv_msgno TYPE symsgno  DEFAULT sy-msgno
+              iv_msgv1 TYPE symsgv   DEFAULT sy-msgv1
+              iv_msgv2 TYPE symsgv   DEFAULT sy-msgv2
+              iv_msgv3 TYPE symsgv   DEFAULT sy-msgv3
+              iv_msgv4 TYPE symsgv   DEFAULT sy-msgv4
+              it_attr  TYPE t_attr.
+
   "! <strong>[SAP]</strong> Check if log has an error
   "!
   "! @parameter rv_result | Result
