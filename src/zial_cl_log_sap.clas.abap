@@ -984,7 +984,6 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
     CASE sy-subrc.
       WHEN 0.
         save_msgde( lt_new_lognumbers ).
-        COMMIT WORK.
 
       WHEN OTHERS.
         DATA(lv_subrc) = sy-subrc.
