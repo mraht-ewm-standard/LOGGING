@@ -1,107 +1,85 @@
-CLASS zial_cl_log_cnf DEFINITION
+CLASS zdgl_cl_log_conf DEFINITION
   PUBLIC FINAL
   CREATE PUBLIC.
 
   PUBLIC SECTION.
-    CLASS-METHODS get
-      RETURNING VALUE(rs_log_cnf) TYPE zial_t_log_cnf.
-
-    CLASS-METHODS is_valid_log_object
-      IMPORTING iv_object        TYPE balobj_d
-      RETURNING VALUE(rv_result) TYPE abap_bool.
-
-    CLASS-METHODS is_valid_log_subobject
-      IMPORTING iv_object        TYPE balobj_d
-                iv_subobject     TYPE balsubobj
-      RETURNING VALUE(rv_result) TYPE abap_bool.
-
-    CLASS-METHODS free.
-
-  PROTECTED SECTION.
     CONSTANTS: BEGIN OF mc_default,
-                 log_object    TYPE balobj_d  VALUE 'SYSLOG' ##NO_TEXT, " Adjust to your needs
-                 log_subobject TYPE balsubobj VALUE 'GENERAL' ##NO_TEXT,
+                 "! Not configurable as SAP standard defines the maximum number of
+                 "! entries hardcoded in include SBAL_CONSTANTS, CONST_BAL_MSGNUMBER_MAX
+                 max_num_of_entries  TYPE i                              VALUE 999999,
+                 detail_level        TYPE zdgl_de_log_detail_level       VALUE zdgl_cl_log=>mc_detail_level-info,
+                 validity_period     TYPE zdgl_de_log_validity_period    VALUE 180,
+                 "! Minimum detail level for which callstack is to be logged in message details
+                 level_log_callstack TYPE zdgl_de_log_level_log_callstck VALUE zdgl_cl_log=>mc_detail_level-warning,
+                 save_to_appl_log    TYPE zdgl_de_log_save_to_appl_log   VALUE abap_true,
                END OF mc_default.
 
-    CLASS-DATA ms_log_cnf TYPE zial_t_log_cnf.
+    CLASS-METHODS class_constructor.
+
+    CLASS-METHODS get
+      IMPORTING iv_object          TYPE balobj_d
+                iv_subobject       TYPE balsubobj
+                iv_uname           TYPE uname
+      RETURNING VALUE(rs_log_conf) TYPE zdgl_t_log_conf.
+
+  PROTECTED SECTION.
+    CLASS-DATA mt_log_conf TYPE zdgl_tt_log_conf.
 
     CLASS-METHODS read.
 
 ENDCLASS.
 
 
-CLASS zial_cl_log_cnf IMPLEMENTATION.
+CLASS zdgl_cl_log_conf IMPLEMENTATION.
 
-  METHOD free.
+  METHOD class_constructor.
 
-    CLEAR ms_log_cnf.
+    read( ).
 
   ENDMETHOD.
 
 
   METHOD get.
 
-    IF ms_log_cnf IS INITIAL.
-      read( ).
-    ENDIF.
+    WHILE rs_log_conf IS INITIAL.
 
-    rs_log_cnf = ms_log_cnf.
+      DATA(lv_index) = sy-index.
+      CASE lv_index.
+        WHEN 1.
+          rs_log_conf = VALUE #( mt_log_conf[ object    = iv_object
+                                              subobject = iv_subobject
+                                              uname     = iv_uname ] OPTIONAL ).
+
+        WHEN 2.
+          rs_log_conf = VALUE #( mt_log_conf[ object    = iv_object
+                                              subobject = space
+                                              uname     = iv_uname ] OPTIONAL ).
+
+        WHEN 3.
+          rs_log_conf = VALUE #( mt_log_conf[ object    = iv_object
+                                              subobject = iv_subobject
+                                              uname     = space ] OPTIONAL ).
+
+        WHEN 4.
+          rs_log_conf = VALUE #( mt_log_conf[ object    = iv_object
+                                              subobject = space
+                                              uname     = space ] OPTIONAL ).
+
+        WHEN OTHERS.
+          EXIT.
+
+      ENDCASE.
+
+    ENDWHILE.
 
   ENDMETHOD.
 
 
   METHOD read.
 
-    SELECT SINGLE FROM zial_t_log_cnf
+    SELECT FROM zdgl_t_log_conf
       FIELDS *
-      INTO @ms_log_cnf.
-
-    IF    NOT is_valid_log_object( ms_log_cnf-dflt_object )
-       OR NOT is_valid_log_subobject( iv_object    = ms_log_cnf-dflt_object
-                                      iv_subobject = ms_log_cnf-dflt_subobject ).
-      CLEAR: ms_log_cnf-dflt_object,
-             ms_log_cnf-dflt_subobject.
-    ENDIF.
-
-    IF    ms_log_cnf-dflt_object    IS INITIAL
-       OR ms_log_cnf-dflt_subobject IS INITIAL.
-      ms_log_cnf-dflt_object    = mc_default-log_object.
-      ms_log_cnf-dflt_subobject = mc_default-log_subobject.
-    ENDIF.
-
-  ENDMETHOD.
-
-
-  METHOD is_valid_log_object.
-
-    CHECK iv_object IS NOT INITIAL.
-
-    CALL FUNCTION 'BAL_OBJECT_SELECT'
-      EXPORTING  i_object = iv_object
-      EXCEPTIONS OTHERS   = 99.
-    IF sy-subrc NE 0.
-      RETURN.
-    ENDIF.
-
-    rv_result = abap_true.
-
-  ENDMETHOD.
-
-
-  METHOD is_valid_log_subobject.
-
-    CHECK iv_object    IS NOT INITIAL
-      AND iv_subobject IS NOT INITIAL.
-
-    CALL FUNCTION 'BAL_SUBOBJECT_SELECT'
-      EXPORTING  i_object    = iv_object
-                 i_subobject = iv_subobject
-      EXCEPTIONS OTHERS      = 99.
-    IF sy-subrc NE 0.
-      RETURN.
-    ENDIF.
-
-    rv_result = abap_true.
+      INTO TABLE @mt_log_conf.
 
   ENDMETHOD.
 
