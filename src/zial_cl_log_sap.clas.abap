@@ -1075,15 +1075,20 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
   METHOD set_save_to_appl_log.
 
-    DATA(ls_log_conf) = zdgl_cl_log_conf=>get( iv_object    = ms_log-hdr-object
-                                               iv_subobject = ms_log-hdr-subobject
-                                               iv_uname     = sy-uname ).
-    IF ls_log_conf IS INITIAL.
-      ms_log-hdr-save_to_appl_log = abap_true.
+    IF iv_save_to_appl_log IS SUPPLIED.
+      ms_log-hdr-save_to_appl_log = iv_save_to_appl_log.
       RETURN.
     ENDIF.
 
-    ms_log-hdr-save_to_appl_log = ls_log_conf-save_to_appl_log.
+    DATA(ls_log_conf) = zdgl_cl_log_conf=>get( iv_object    = ms_log-hdr-object
+                                               iv_subobject = ms_log-hdr-subobject
+                                               iv_uname     = sy-uname ).
+    IF ls_log_conf IS NOT INITIAL.
+      ms_log-hdr-save_to_appl_log = ls_log_conf-save_to_appl_log.
+      RETURN.
+    ENDIF.
+
+    ms_log-hdr-save_to_appl_log = zdgl_cl_log_conf=>mc_default-save_to_appl_log.
 
   ENDMETHOD.
 
