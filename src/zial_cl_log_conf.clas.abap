@@ -7,10 +7,13 @@ CLASS zdgl_cl_log_conf DEFINITION
                  "! Not configurable as SAP standard defines the maximum number of
                  "! entries hardcoded in include SBAL_CONSTANTS, CONST_BAL_MSGNUMBER_MAX
                  max_num_of_entries  TYPE i                              VALUE 999999,
+                 "! Message detail level
                  detail_level        TYPE zdgl_de_log_detail_level       VALUE zdgl_cl_log=>mc_detail_level-info,
+                 "! Validity period in days
                  validity_period     TYPE zdgl_de_log_validity_period    VALUE 180,
                  "! Minimum detail level for which callstack is to be logged in message details
                  level_log_callstack TYPE zdgl_de_log_level_log_callstck VALUE zdgl_cl_log=>mc_detail_level-warning,
+                 "! Save to application log
                  save_to_appl_log    TYPE zdgl_de_log_save_to_appl_log   VALUE abap_true,
                END OF mc_default.
 
