@@ -128,6 +128,6 @@ INTERFACE zial_if_log_sap
   "!
   "! @parameter iv_save_to_appl_log | Save to application log? (Y/N)
   METHODS set_save_to_appl_log
-    IMPORTING iv_save_to_appl_log TYPE zdgl_de_log_save_to_appl_log.
+    IMPORTING iv_save_to_appl_log TYPE zdgl_de_log_save_to_appl_log DEFAULT abap_true.
 
 ENDINTERFACE.
