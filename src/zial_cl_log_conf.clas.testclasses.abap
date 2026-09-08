@@ -1,5 +1,5 @@
 "! <p class="shorttext synchronized">ABAP Unit Test: Template</p>
-CLASS ltc_log_cnf DEFINITION FINAL
+CLASS ltc_log_conf DEFINITION FINAL
   CREATE PUBLIC
   FOR TESTING RISK LEVEL HARMLESS.
 
@@ -11,11 +11,11 @@ CLASS ltc_log_cnf DEFINITION FINAL
              dflt_subobject1 TYPE balsubobj,
              dflt_object2    TYPE balobj_d,
              dflt_subobject2 TYPE balsubobj,
-             t_log_cnf1      TYPE zial_tt_log_cnf,
-             t_log_cnf2      TYPE zial_tt_log_cnf,
+             t_log_cnf1      TYPE zial_tt_log_conf,
+             t_log_cnf2      TYPE zial_tt_log_conf,
            END OF s_tdc_data.
 
-    CONSTANTS mc_tdc_cnt TYPE etobj_name VALUE 'ZIAL_TDC_LOG_CNF'.
+    CONSTANTS mc_tdc_cnt TYPE etobj_name VALUE 'ZIAL_TDC_LOG_CONF'.
 
     CLASS-DATA mo_aunit    TYPE REF TO zial_cl_aunit.
     CLASS-DATA ms_tdc_data TYPE s_tdc_data.
@@ -36,7 +36,7 @@ CLASS ltc_log_cnf DEFINITION FINAL
 ENDCLASS.
 
 
-CLASS ltc_log_cnf IMPLEMENTATION.
+CLASS ltc_log_conf IMPLEMENTATION.
 
   METHOD class_setup.
 
