@@ -99,6 +99,7 @@ INTERFACE zial_if_log_sap
     IMPORTING iv_finalize TYPE abap_bool DEFAULT abap_true.
 
   "! <strong>[SAP]</strong> Set log external number (description)
+  "!
   "! @parameter iv_extnumber | External number as line
   "! @parameter it_extnumber | External numbers as table of strings
   METHODS set_extnumber
@@ -106,6 +107,7 @@ INTERFACE zial_if_log_sap
               it_extnumber TYPE stringtab OPTIONAL.
 
   "! <strong>[SAP]</strong> Set log detail level
+  "!
   "! @parameter iv_detail_level | Detail level
   METHODS set_detail_level
     IMPORTING iv_detail_level TYPE zial_de_log_detail_level OPTIONAL.
@@ -121,5 +123,11 @@ INTERFACE zial_if_log_sap
   "! @parameter iv_level | Level of message type
   METHODS set_level_log_callstack
     IMPORTING iv_level TYPE zial_de_log_detail_level OPTIONAL.
+
+  "! <strong>[SAP]</strong> Set whether log should be saved to appl. log
+  "!
+  "! @parameter iv_save_to_appl_log | Save to application log? (Y/N)
+  METHODS set_save_to_appl_log
+    IMPORTING iv_save_to_appl_log TYPE zdgl_de_log_save_to_appl_log.
 
 ENDINTERFACE.
