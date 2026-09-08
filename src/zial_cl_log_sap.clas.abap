@@ -22,6 +22,7 @@ CLASS zial_cl_log_sap DEFINITION
     ALIASES set_detail_level        FOR zial_if_log_sap~set_detail_level.
     ALIASES set_expiry_date         FOR zial_if_log_sap~set_expiry_date.
     ALIASES set_level_log_callstack FOR zial_if_log_sap~set_level_log_callstack.
+    ALIASES set_save_to_appl_log    FOR zdgl_if_log_sap~set_save_to_appl_log.
 
     TYPES t_spar TYPE STANDARD TABLE OF spar WITH DEFAULT KEY.
 
@@ -635,6 +636,7 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
     set_detail_level( ).
     set_level_log_callstack( ).
     set_expiry_date( ).
+    set_save_to_appl_log( ).
 
     create_log( ).
 
@@ -968,6 +970,10 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
   METHOD save_log.
 
+    IF ms_log-hdr-save_to_appl_log EQ abap_false.
+      RETURN.
+    ENDIF.
+
     DATA(lt_log_handles)    = VALUE bal_t_logh( ( iv_log_handle ) ).
     DATA(lt_new_lognumbers) = VALUE bal_t_lgnm( ).
     CALL FUNCTION 'BAL_DB_SAVE'
@@ -976,10 +982,7 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
                  i_2th_connection     = abap_true
                  i_2th_connect_commit = abap_true
       IMPORTING  e_new_lognumbers     = lt_new_lognumbers
-      EXCEPTIONS log_not_found        = 1
-                 save_not_allowed     = 2
-                 numbering_error      = 3
-                 OTHERS               = 4.
+      EXCEPTIONS OTHERS               = 99.
 
     CASE sy-subrc.
       WHEN 0.
@@ -1066,6 +1069,21 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
       ENDCASE.
 
     ENDWHILE.
+
+  ENDMETHOD.
+
+
+  METHOD set_save_to_appl_log.
+
+    DATA(ls_log_conf) = zdgl_cl_log_conf=>get( iv_object    = ms_log-hdr-object
+                                               iv_subobject = ms_log-hdr-subobject
+                                               iv_uname     = sy-uname ).
+    IF ls_log_conf IS INITIAL.
+      ms_log-hdr-save_to_appl_log = abap_true.
+      RETURN.
+    ENDIF.
+
+    ms_log-hdr-save_to_appl_log = ls_log_conf-save_to_appl_log.
 
   ENDMETHOD.
 
