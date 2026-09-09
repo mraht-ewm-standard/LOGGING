@@ -15,14 +15,12 @@ CLASS zial_cl_log_sap DEFINITION
     ALIASES log_bapiret             FOR zial_if_log_sap~log_bapiret.
     ALIASES log_line                FOR zial_if_log_sap~log_line.
     ALIASES log_caller              FOR zial_if_log_sap~log_caller.
-    ALIASES log_attr                FOR zdgl_if_log_sap~log_attr.
     ALIASES has_error               FOR zial_if_log_sap~has_error.
     ALIASES save                    FOR zial_if_log_sap~save.
     ALIASES set_extnumber           FOR zial_if_log_sap~set_extnumber.
     ALIASES set_detail_level        FOR zial_if_log_sap~set_detail_level.
     ALIASES set_expiry_date         FOR zial_if_log_sap~set_expiry_date.
     ALIASES set_level_log_callstack FOR zial_if_log_sap~set_level_log_callstack.
-    ALIASES set_save_to_appl_log    FOR zdgl_if_log_sap~set_save_to_appl_log.
 
     TYPES t_spar TYPE STANDARD TABLE OF spar WITH DEFAULT KEY.
 
@@ -636,7 +634,6 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
     set_detail_level( ).
     set_level_log_callstack( ).
     set_expiry_date( ).
-    set_save_to_appl_log( ).
 
     create_log( ).
 
@@ -817,34 +814,6 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD log_attr.
-
-    DATA(lt_msgde) = VALUE rsra_t_alert_definition( ).
-    LOOP AT it_attr ASSIGNING FIELD-SYMBOL(<ls_attr>).
-      INSERT VALUE #( fnam = <ls_attr>-name
-                      low  = <ls_attr>-value ) INTO TABLE lt_msgde.
-    ENDLOOP.
-
-    IF     iv_msgid IS INITIAL
-       AND iv_msgno IS INITIAL
-       AND iv_msgtx IS INITIAL.
-      log_message( iv_msgtx = TEXT-003
-                   it_msgde = lt_msgde ).
-    ELSE.
-      log_message( iv_msgty = iv_msgty
-                   iv_msgtx = iv_msgtx
-                   iv_msgid = iv_msgid
-                   iv_msgno = iv_msgno
-                   iv_msgv1 = iv_msgv1
-                   iv_msgv2 = iv_msgv2
-                   iv_msgv3 = iv_msgv3
-                   iv_msgv4 = iv_msgv4
-                   it_msgde = lt_msgde ).
-    ENDIF.
-
-  ENDMETHOD.
-
-
   METHOD on_log_callback.
 
     CONSTANTS lc_log_number TYPE spo_par VALUE '%LOGNUMBER'.
@@ -970,10 +939,6 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
   METHOD save_log.
 
-    IF ms_log-hdr-save_to_appl_log EQ abap_false.
-      RETURN.
-    ENDIF.
-
     DATA(lt_log_handles)    = VALUE bal_t_logh( ( iv_log_handle ) ).
     DATA(lt_new_lognumbers) = VALUE bal_t_lgnm( ).
     CALL FUNCTION 'BAL_DB_SAVE'
@@ -982,11 +947,15 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
                  i_2th_connection     = abap_true
                  i_2th_connect_commit = abap_true
       IMPORTING  e_new_lognumbers     = lt_new_lognumbers
-      EXCEPTIONS OTHERS               = 99.
+      EXCEPTIONS log_not_found        = 1
+                 save_not_allowed     = 2
+                 numbering_error      = 3
+                 OTHERS               = 4.
 
     CASE sy-subrc.
       WHEN 0.
         save_msgde( lt_new_lognumbers ).
+        COMMIT WORK.
 
       WHEN OTHERS.
         DATA(lv_subrc) = sy-subrc.
@@ -1069,26 +1038,6 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
       ENDCASE.
 
     ENDWHILE.
-
-  ENDMETHOD.
-
-
-  METHOD set_save_to_appl_log.
-
-    IF iv_save_to_appl_log IS SUPPLIED.
-      ms_log-hdr-save_to_appl_log = iv_save_to_appl_log.
-      RETURN.
-    ENDIF.
-
-    DATA(ls_log_conf) = zdgl_cl_log_conf=>get( iv_object    = ms_log-hdr-object
-                                               iv_subobject = ms_log-hdr-subobject
-                                               iv_uname     = sy-uname ).
-    IF ls_log_conf IS NOT INITIAL.
-      ms_log-hdr-save_to_appl_log = ls_log_conf-save_to_appl_log.
-      RETURN.
-    ENDIF.
-
-    ms_log-hdr-save_to_appl_log = zdgl_cl_log_conf=>mc_default-save_to_appl_log.
 
   ENDMETHOD.
 
