@@ -1,4 +1,4 @@
-CLASS zdgl_cl_log_conf DEFINITION
+CLASS zial_cl_log_conf DEFINITION
   PUBLIC FINAL
   CREATE PUBLIC.
 
@@ -8,13 +8,13 @@ CLASS zdgl_cl_log_conf DEFINITION
                  "! entries hardcoded in include SBAL_CONSTANTS, CONST_BAL_MSGNUMBER_MAX
                  max_num_of_entries  TYPE i                              VALUE 999999,
                  "! Message detail level
-                 detail_level        TYPE zdgl_de_log_detail_level       VALUE zdgl_cl_log=>mc_detail_level-info,
+                 detail_level        TYPE zial_de_log_detail_level       VALUE zial_cl_log=>mc_detail_level-info,
                  "! Validity period in days
-                 validity_period     TYPE zdgl_de_log_validity_period    VALUE 180,
+                 validity_period     TYPE zial_de_log_validity_period    VALUE 180,
                  "! Minimum detail level for which callstack is to be logged in message details
-                 level_log_callstack TYPE zdgl_de_log_level_log_callstck VALUE zdgl_cl_log=>mc_detail_level-warning,
+                 level_log_callstack TYPE zial_de_log_level_log_callstck VALUE zial_cl_log=>mc_detail_level-warning,
                  "! Save to application log
-                 save_to_appl_log    TYPE zdgl_de_log_save_to_appl_log   VALUE abap_true,
+                 save_to_appl_log    TYPE zial_de_log_save_to_appl_log   VALUE abap_true,
                END OF mc_default.
 
     CLASS-METHODS class_constructor.
@@ -23,17 +23,17 @@ CLASS zdgl_cl_log_conf DEFINITION
       IMPORTING iv_object          TYPE balobj_d
                 iv_subobject       TYPE balsubobj
                 iv_uname           TYPE uname
-      RETURNING VALUE(rs_log_conf) TYPE zdgl_t_log_conf.
+      RETURNING VALUE(rs_log_conf) TYPE zial_t_log_conf.
 
   PROTECTED SECTION.
-    CLASS-DATA mt_log_conf TYPE zdgl_tt_log_conf.
+    CLASS-DATA mt_log_conf TYPE zial_tt_log_conf.
 
     CLASS-METHODS read.
 
 ENDCLASS.
 
 
-CLASS zdgl_cl_log_conf IMPLEMENTATION.
+CLASS zial_cl_log_conf IMPLEMENTATION.
 
   METHOD class_constructor.
 
@@ -80,7 +80,7 @@ CLASS zdgl_cl_log_conf IMPLEMENTATION.
 
   METHOD read.
 
-    SELECT FROM zdgl_t_log_conf
+    SELECT FROM zial_t_log_conf
       FIELDS *
       INTO TABLE @mt_log_conf.
 
