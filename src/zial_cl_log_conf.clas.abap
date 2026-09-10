@@ -86,4 +86,7 @@ CLASS zial_cl_log_conf IMPLEMENTATION.
 
   ENDMETHOD.
 
+
+
+
 ENDCLASS.

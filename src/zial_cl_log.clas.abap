@@ -30,7 +30,7 @@ CLASS zial_cl_log DEFINITION
                END OF mc_log_process.
 
     CONSTANTS: BEGIN OF mc_validity_period,
-                 undef TYPE zial_de_log_validity_period VALUE 0,
+                 undef TYPE zial_de_log_validity_period VALUE -1,
                END OF mc_validity_period.
 
     CONSTANTS: BEGIN OF mc_detail_level,
@@ -41,6 +41,11 @@ CLASS zial_cl_log DEFINITION
                  info    TYPE zial_de_log_detail_level VALUE 4,
                  undef   TYPE zial_de_log_detail_level VALUE 9,
                END OF mc_detail_level.
+
+    CONSTANTS: BEGIN OF mc_default,
+                 log_object    TYPE balobj_d  VALUE 'SYSLOG' ##NO_TEXT, " Adjust to your needs
+                 log_subobject TYPE balsubobj VALUE 'GENERAL' ##NO_TEXT,
+               END OF mc_default.
 
     CONSTANTS: BEGIN OF mc_msgty,
                  any_error TYPE char3   VALUE 'EAX',
@@ -61,7 +66,7 @@ CLASS zial_cl_log DEFINITION
     "!
     "! @parameter ro_instance | Instance
     CLASS-METHODS get
-      RETURNING VALUE(ro_instance) TYPE zial_if_log_sap=>r_log_instance.
+      RETURNING VALUE(ro_instance) TYPE zial_cl_log_const=>r_log_instance.
 
     "! Create new log instance
     "!
@@ -71,11 +76,11 @@ CLASS zial_cl_log DEFINITION
     "! @parameter it_extnumber | External number elements
     "! @parameter ro_instance  | Log instance
     CLASS-METHODS create
-      IMPORTING iv_object          TYPE balobj_d  OPTIONAL
-                iv_subobject       TYPE balsubobj OPTIONAL
+      IMPORTING iv_object          TYPE balobj_d  DEFAULT mc_default-log_object
+                iv_subobject       TYPE balsubobj DEFAULT mc_default-log_subobject
                 iv_extnumber       TYPE balnrext  OPTIONAL
                 it_extnumber       TYPE stringtab OPTIONAL
-      RETURNING VALUE(ro_instance) TYPE zial_if_log_sap=>r_log_instance.
+      RETURNING VALUE(ro_instance) TYPE zial_cl_log_const=>r_log_instance.
 
     CLASS-METHODS delete
       IMPORTING iv_log_handle TYPE balloghndl.
@@ -113,9 +118,9 @@ CLASS zial_cl_log DEFINITION
     "! Convert bapiret structure to message string
     "!
     "! @parameter iv_msgid   | Message ID
+    "! @parameter iv_msgty   | Message type
     "! @parameter iv_msgno   | Message number
     "! @parameter iv_msgtx   | Message text
-    "! @parameter iv_msgty   | Message type
     "! @parameter iv_msgv1   | Message variable 1
     "! @parameter iv_msgv2   | Message variable 2
     "! @parameter iv_msgv3   | Message variable 3
@@ -124,9 +129,9 @@ CLASS zial_cl_log DEFINITION
     "! @parameter rv_result  | Message as string
     CLASS-METHODS to_string
       IMPORTING iv_msgid         TYPE symsgid  DEFAULT sy-msgid
+                iv_msgty         TYPE symsgty  DEFAULT sy-msgty
                 iv_msgno         TYPE symsgno  DEFAULT sy-msgno
                 iv_msgtx         TYPE bapi_msg OPTIONAL
-                iv_msgty         TYPE symsgty  DEFAULT sy-msgty
                 iv_msgv1         TYPE symsgv   DEFAULT sy-msgv1
                 iv_msgv2         TYPE symsgv   DEFAULT sy-msgv2
                 iv_msgv3         TYPE symsgv   DEFAULT sy-msgv3
@@ -197,16 +202,27 @@ CLASS zial_cl_log DEFINITION
     "!
     "! @parameter iv_severity | <p class="shorttext synchronized">Severity</p>
     "! @parameter it_bapiret  | <p class="shorttext synchronized">Protocol</p>
+    "! @parameter es_bapiret  | <p class="shorttext synchronized">Error message</p>
     "! @parameter rv_result   | <p class="shorttext synchronized">Error? (Y/N)</p>
     CLASS-METHODS has_error
-      IMPORTING iv_severity      TYPE bapi_mtype OPTIONAL
-                it_bapiret       TYPE bapirettab OPTIONAL
+      IMPORTING iv_severity       TYPE bapi_mtype OPTIONAL
+                it_bapiret        TYPE bapirettab OPTIONAL
       PREFERRED PARAMETER it_bapiret
-      RETURNING VALUE(rv_result) TYPE abap_bool.
+      EXPORTING VALUE(es_bapiret) TYPE bapiret2
+      RETURNING VALUE(rv_result)  TYPE abap_bool.
 
     CLASS-METHODS get_last_error
       IMPORTING it_bapiret         TYPE bapiret2_t
       RETURNING VALUE(rs_bapiret2) TYPE bapiret2.
+
+    CLASS-METHODS is_valid_log_object
+      IMPORTING iv_object        TYPE balobj_d
+      RETURNING VALUE(rv_result) TYPE abap_bool.
+
+    CLASS-METHODS is_valid_log_subobject
+      IMPORTING iv_object        TYPE balobj_d
+                iv_subobject     TYPE balsubobj
+      RETURNING VALUE(rv_result) TYPE abap_bool.
 
   PROTECTED SECTION.
     CONSTANTS mc_msg_ident          TYPE c LENGTH 9 VALUE 'MSG_IDENT' ##NO_TEXT.
@@ -218,7 +234,7 @@ CLASS zial_cl_log DEFINITION
     CLASS-DATA mv_log_part_id           TYPE i.
     CLASS-DATA ms_symsg                 TYPE symsg.
 
-    CLASS-DATA mo_instance              TYPE zial_if_log_sap=>r_log_instance.
+    CLASS-DATA mo_instance              TYPE zial_cl_log_const=>r_log_instance.
 
     CLASS-METHODS harmonize_msg
       IMPORTING iv_msgid   TYPE symsgid
@@ -315,8 +331,10 @@ CLASS zial_cl_log IMPLEMENTATION.
 
     mo_instance = zial_cl_log_stack=>pop( )-instance.
     IF mo_instance IS INITIAL.
-      mo_instance = create( iv_extnumber = CONV #( TEXT-001 ) ).
-      mo_instance->mv_is_fallback_log = abap_true.
+      mo_instance = create( iv_object    = mc_default-log_object
+                            iv_subobject = mc_default-log_subobject
+                            iv_extnumber = CONV #( TEXT-001 ) ).
+      mo_instance->mv_is_dummy_log = abap_true.
     ENDIF.
 
     ro_instance = mo_instance.
@@ -367,12 +385,14 @@ CLASS zial_cl_log IMPLEMENTATION.
 
   METHOD has_error.
 
+    CLEAR es_bapiret.
+
     IF iv_severity CA mc_msgty-any_error.
       rv_result = abap_true.
       RETURN.
     ENDIF.
 
-    LOOP AT it_bapiret TRANSPORTING NO FIELDS WHERE type CA mc_msgty-any_error.
+    LOOP AT it_bapiret INTO es_bapiret WHERE type CA mc_msgty-any_error.
       rv_result = abap_true.
       EXIT.
     ENDLOOP.
@@ -582,8 +602,8 @@ CLASS zial_cl_log IMPLEMENTATION.
 
     rv_result = zial_cl_log_msg=>to_string( iv_msgid   = iv_msgid
                                             iv_msgno   = iv_msgno
-                                            iv_msgtx   = iv_msgtx
                                             iv_msgty   = iv_msgty
+                                            iv_msgtx   = iv_msgtx
                                             iv_msgv1   = iv_msgv1
                                             iv_msgv2   = iv_msgv2
                                             iv_msgv3   = iv_msgv3
@@ -605,6 +625,40 @@ CLASS zial_cl_log IMPLEMENTATION.
                                               iv_msgv4   = iv_msgv4
                                               is_bapiret = is_bapiret
                                     IMPORTING es_symsg   = rs_symsg ).
+
+  ENDMETHOD.
+
+
+  METHOD is_valid_log_object.
+
+    CHECK iv_object IS NOT INITIAL.
+
+    CALL FUNCTION 'BAL_OBJECT_SELECT'
+      EXPORTING  i_object = iv_object
+      EXCEPTIONS OTHERS   = 99.
+    IF sy-subrc NE 0.
+      RETURN.
+    ENDIF.
+
+    rv_result = abap_true.
+
+  ENDMETHOD.
+
+
+  METHOD is_valid_log_subobject.
+
+    CHECK iv_object    IS NOT INITIAL
+      AND iv_subobject IS NOT INITIAL.
+
+    CALL FUNCTION 'BAL_SUBOBJECT_SELECT'
+      EXPORTING  i_object    = iv_object
+                 i_subobject = iv_subobject
+      EXCEPTIONS OTHERS      = 99.
+    IF sy-subrc NE 0.
+      RETURN.
+    ENDIF.
+
+    rv_result = abap_true.
 
   ENDMETHOD.
 
