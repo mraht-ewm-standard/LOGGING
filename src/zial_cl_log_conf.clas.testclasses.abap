@@ -7,18 +7,13 @@ CLASS ltc_log_conf DEFINITION FINAL
     TYPES t_dummy TYPE STANDARD TABLE OF dummy WITH EMPTY KEY.
 
     TYPES: BEGIN OF s_tdc_data,
-             dflt_object1    TYPE balobj_d,
-             dflt_subobject1 TYPE balsubobj,
-             dflt_object2    TYPE balobj_d,
-             dflt_subobject2 TYPE balsubobj,
-             t_log_cnf1      TYPE zial_tt_log_conf,
-             t_log_cnf2      TYPE zial_tt_log_conf,
+             t_log_conf TYPE zial_tt_log_conf,
            END OF s_tdc_data.
 
     CONSTANTS mc_tdc_cnt TYPE etobj_name VALUE 'ZIAL_TDC_LOG_CONF'.
 
-    CLASS-DATA mo_aunit    TYPE REF TO zial_cl_aunit.
-    CLASS-DATA ms_tdc_data TYPE s_tdc_data.
+    CLASS-DATA mo_aunit                 TYPE REF TO zial_cl_aunit.
+    CLASS-DATA ms_tdc_data              TYPE s_tdc_data.
 
     CLASS-DATA mo_osql_test_environment TYPE REF TO if_osql_test_environment.
 
@@ -41,7 +36,9 @@ CLASS ltc_log_conf IMPLEMENTATION.
   METHOD class_setup.
 
     mo_aunit = zial_cl_aunit=>on_class_setup( iv_tdc_cnt  = mc_tdc_cnt
-                                              ir_tdc_data = REF #( ms_tdc_data ) ).
+                                              ir_tdc_data = REF #( ms_tdc_data )
+                                              it_sql_data = VALUE #( ( tbl_name = 'ZIAL_T_LOG_CONF'
+                                                                       tbl_data = REF #( ms_tdc_data-t_log_conf ) ) ) ).
 
   ENDMETHOD.
 
@@ -71,17 +68,16 @@ CLASS ltc_log_conf IMPLEMENTATION.
 
     CHECK mo_aunit->is_active( abap_true ).
 
-    mo_aunit->set_sql_data( VALUE #( ( tbl_name = 'ZIAL_T_LOG_CNF'
-                                       tbl_data = REF #( ms_tdc_data-t_log_cnf1 ) ) ) ).
+    LOOP AT ms_tdc_data-t_log_conf ASSIGNING FIELD-SYMBOL(<ls_log_conf_exp>).
 
-    zial_cl_log_cnf=>free( ).
-    DATA(ls_log_cnf) = zial_cl_log_cnf=>get( ).
+      DATA(ls_log_conf_act) = zial_cl_log_conf=>get( iv_object    = <ls_log_conf_exp>-object
+                                                     iv_subobject = <ls_log_conf_exp>-subobject
+                                                     iv_uname     = <ls_log_conf_exp>-uname ).
 
-    cl_abap_unit_assert=>assert_equals( exp = ms_tdc_data-dflt_object1
-                                        act = ls_log_cnf-dflt_object ).
+      cl_abap_unit_assert=>assert_equals( exp = <ls_log_conf_exp>
+                                          act = ls_log_conf_act ).
 
-    cl_abap_unit_assert=>assert_equals( exp = ms_tdc_data-dflt_subobject1
-                                        act = ls_log_cnf-dflt_subobject ).
+    ENDLOOP.
 
   ENDMETHOD.
 
@@ -90,17 +86,11 @@ CLASS ltc_log_conf IMPLEMENTATION.
 
     CHECK mo_aunit->is_active( abap_true ).
 
-    mo_aunit->set_sql_data( VALUE #( ( tbl_name = 'ZIAL_T_LOG_CNF'
-                                       tbl_data = REF #( ms_tdc_data-t_log_cnf2 ) ) ) ).
+    DATA(ls_log_conf_act) = zial_cl_log_conf=>get( iv_object    = space
+                                                   iv_subobject = space
+                                                   iv_uname     = space ).
 
-    zial_cl_log_cnf=>free( ).
-    DATA(ls_log_cnf) = zial_cl_log_cnf=>get( ).
-
-    cl_abap_unit_assert=>assert_equals( exp = ms_tdc_data-dflt_object2
-                                        act = ls_log_cnf-dflt_object ).
-
-    cl_abap_unit_assert=>assert_equals( exp = ms_tdc_data-dflt_subobject2
-                                        act = ls_log_cnf-dflt_subobject ).
+    cl_abap_unit_assert=>assert_initial( act = ls_log_conf_act ).
 
   ENDMETHOD.
 
