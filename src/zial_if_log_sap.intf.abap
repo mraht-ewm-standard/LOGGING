@@ -2,8 +2,6 @@
 INTERFACE zial_if_log_sap
   PUBLIC.
 
-  TYPES r_log_instance TYPE REF TO zial_cl_log_ewm.
-
   "! <strong>[SAP]</strong> Get handle of log
   "!
   "! @parameter rv_log_handle | Log handle
@@ -18,25 +16,27 @@ INTERFACE zial_if_log_sap
 
   "! <strong>[SAP]</strong> Log a message with optionally message details
   "!
-  "! @parameter iv_msgty | Message type
-  "! @parameter iv_msgtx | Message text
-  "! @parameter iv_msgid | Message ID
-  "! @parameter iv_msgno | Message number
-  "! @parameter iv_msgv1 | Message variable 1
-  "! @parameter iv_msgv2 | Message variable 2
-  "! @parameter iv_msgv3 | Message variable 3
-  "! @parameter iv_msgv4 | Message variable 4
-  "! @parameter it_msgde | Message details
+  "! @parameter iv_msgty         | Message type
+  "! @parameter iv_msgtx         | Message text
+  "! @parameter iv_msgid         | Message ID
+  "! @parameter iv_msgno         | Message number
+  "! @parameter iv_msgv1         | Message variable 1
+  "! @parameter iv_msgv2         | Message variable 2
+  "! @parameter iv_msgv3         | Message variable 3
+  "! @parameter iv_msgv4         | Message variable 4
+  "! @parameter iv_add_callstack | Add callstack to message
+  "! @parameter it_msgde         | Message details
   METHODS log_message
-    IMPORTING iv_msgty TYPE symsgty                 DEFAULT sy-msgty
-              iv_msgtx TYPE bapi_msg                OPTIONAL
-              iv_msgid TYPE symsgid                 DEFAULT sy-msgid
-              iv_msgno TYPE symsgno                 DEFAULT sy-msgno
-              iv_msgv1 TYPE symsgv                  DEFAULT sy-msgv1
-              iv_msgv2 TYPE symsgv                  DEFAULT sy-msgv2
-              iv_msgv3 TYPE symsgv                  DEFAULT sy-msgv3
-              iv_msgv4 TYPE symsgv                  DEFAULT sy-msgv4
-              it_msgde TYPE rsra_t_alert_definition OPTIONAL.
+    IMPORTING iv_msgty         TYPE symsgty                 DEFAULT sy-msgty
+              iv_msgtx         TYPE bapi_msg                OPTIONAL
+              iv_msgid         TYPE symsgid                 DEFAULT sy-msgid
+              iv_msgno         TYPE symsgno                 DEFAULT sy-msgno
+              iv_msgv1         TYPE symsgv                  DEFAULT sy-msgv1
+              iv_msgv2         TYPE symsgv                  DEFAULT sy-msgv2
+              iv_msgv3         TYPE symsgv                  DEFAULT sy-msgv3
+              iv_msgv4         TYPE symsgv                  DEFAULT sy-msgv4
+              iv_add_callstack TYPE abap_bool               DEFAULT abap_false
+              it_msgde         TYPE rsra_t_alert_definition OPTIONAL.
 
   "! <strong>[SAP]</strong> Log exception
   "!
@@ -64,6 +64,35 @@ INTERFACE zial_if_log_sap
   "! <strong>[SAP]</strong> Log name of development object which called the function to be logged
   METHODS log_caller.
 
+  TYPES: BEGIN OF s_attr,
+           name  TYPE fieldname,
+           value TYPE fieldvalue,
+         END OF s_attr,
+         t_attr TYPE STANDARD TABLE OF s_attr WITH EMPTY KEY
+                                              WITH NON-UNIQUE SORTED KEY k1 COMPONENTS name.
+
+  "! <strong>[SAP]</strong> Log list of attributes
+  "!
+  "! @parameter iv_msgty | Message type
+  "! @parameter iv_msgtx | Message text
+  "! @parameter iv_msgid | Message ID
+  "! @parameter iv_msgno | Message number
+  "! @parameter iv_msgv1 | Message variable 1
+  "! @parameter iv_msgv2 | Message variable 2
+  "! @parameter iv_msgv3 | Message variable 3
+  "! @parameter iv_msgv4 | Message variable 4
+  "! @parameter it_attr  | List of attributes
+  METHODS log_attr
+    IMPORTING iv_msgty TYPE symsgty  DEFAULT sy-msgty
+              iv_msgtx TYPE bapi_msg OPTIONAL
+              iv_msgid TYPE symsgid  DEFAULT sy-msgid
+              iv_msgno TYPE symsgno  DEFAULT sy-msgno
+              iv_msgv1 TYPE symsgv   DEFAULT sy-msgv1
+              iv_msgv2 TYPE symsgv   DEFAULT sy-msgv2
+              iv_msgv3 TYPE symsgv   DEFAULT sy-msgv3
+              iv_msgv4 TYPE symsgv   DEFAULT sy-msgv4
+              it_attr  TYPE t_attr.
+
   "! <strong>[SAP]</strong> Check if log has an error
   "!
   "! @parameter rv_result | Result
@@ -77,6 +106,7 @@ INTERFACE zial_if_log_sap
     IMPORTING iv_finalize TYPE abap_bool DEFAULT abap_true.
 
   "! <strong>[SAP]</strong> Set log external number (description)
+  "!
   "! @parameter iv_extnumber | External number as line
   "! @parameter it_extnumber | External numbers as table of strings
   METHODS set_extnumber
@@ -99,5 +129,11 @@ INTERFACE zial_if_log_sap
   "! @parameter iv_level | Level of message type
   METHODS set_level_log_callstack
     IMPORTING iv_level TYPE zial_de_log_detail_level OPTIONAL.
+
+  "! <strong>[SAP]</strong> Set whether log should be saved to appl. log
+  "!
+  "! @parameter iv_save_to_appl_log | Save to application log? (Y/N)
+  METHODS set_save_to_appl_log
+    IMPORTING iv_save_to_appl_log TYPE zial_de_log_save_to_appl_log DEFAULT abap_true.
 
 ENDINTERFACE.

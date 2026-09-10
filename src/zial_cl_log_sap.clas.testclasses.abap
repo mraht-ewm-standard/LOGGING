@@ -13,7 +13,7 @@ CLASS ltc_log DEFINITION FINAL
              log_subobject2 TYPE balsubobj,
              log_object3    TYPE balobj_d,
              log_subobject3 TYPE balsubobj,
-             t_log_cnf      TYPE zial_tt_log_cnf,
+             t_log_cnf      TYPE zial_tt_log_conf,
            END OF s_tdc_data.
 
     CONSTANTS mc_tdc_cnt TYPE etobj_name VALUE 'ZIAL_TDC_LOG_SAP'.
@@ -82,7 +82,7 @@ CLASS ltc_log IMPLEMENTATION.
            sy-msgno.
 
     DATA(lo_log) = CAST zial_cl_log_sap( zial_cl_log=>get( ) ).
-    DO zial_cl_log_act=>mc_default-max_num_of_entries - 4 TIMES.
+    DO zial_cl_log_conf=>mc_default-max_num_of_entries - 4 TIMES.
       INSERT VALUE #( ) INTO TABLE lo_log->mt_bapiret2.
     ENDDO.
 
