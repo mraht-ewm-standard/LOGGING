@@ -24,7 +24,7 @@ CLASS zial_cl_log_sap DEFINITION
     ALIASES set_level_log_callstack FOR zial_if_log_sap~set_level_log_callstack.
     ALIASES set_save_to_appl_log    FOR zial_if_log_sap~set_save_to_appl_log.
     ALIASES set_save_continously    FOR zial_if_log_sap~set_save_continously.
-  
+
     TYPES t_spar TYPE STANDARD TABLE OF spar WITH DEFAULT KEY.
 
     CONSTANTS mc_class_name TYPE classname VALUE 'ZIAL_CL_LOG_SAP' ##NO_TEXT.
@@ -74,7 +74,7 @@ CLASS zial_cl_log_sap DEFINITION
 
     DATA mv_save_continously   TYPE abap_bool.
     DATA ms_processing_control TYPE s_processing_control.
-    
+
     DATA mv_is_dummy_log       TYPE abap_bool.
     DATA mv_process_bgn        TYPE timestampl.
     DATA mv_process_end        TYPE timestampl.
@@ -334,7 +334,7 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
                               iv_subobject = iv_subobject
                     IMPORTING ev_object    = DATA(lv_object)
                               ev_subobject = DATA(lv_subobject) ).
-    
+
     ms_log-hdr = VALUE #( object    = lv_object
                           subobject = lv_subobject
                           aluser    = sy-uname

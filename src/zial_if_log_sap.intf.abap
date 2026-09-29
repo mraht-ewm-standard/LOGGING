@@ -140,6 +140,6 @@ INTERFACE zial_if_log_sap
   "!
   "! @parameter iv_save_continously | Save continously to application log? (Y/N)
   METHODS set_save_continously
-    IMPORTING iv_save_continously TYPE zial_de_log_save_continously DEFAULT abap_true.  
+    IMPORTING iv_save_continously TYPE zial_de_log_save_continously DEFAULT abap_true.
 
 ENDINTERFACE.
