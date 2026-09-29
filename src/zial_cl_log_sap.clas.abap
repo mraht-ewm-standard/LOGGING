@@ -23,7 +23,8 @@ CLASS zial_cl_log_sap DEFINITION
     ALIASES set_expiry_date         FOR zial_if_log_sap~set_expiry_date.
     ALIASES set_level_log_callstack FOR zial_if_log_sap~set_level_log_callstack.
     ALIASES set_save_to_appl_log    FOR zial_if_log_sap~set_save_to_appl_log.
-
+    ALIASES set_save_continously    FOR zial_if_log_sap~set_save_continously.
+  
     TYPES t_spar TYPE STANDARD TABLE OF spar WITH DEFAULT KEY.
 
     CONSTANTS mc_class_name TYPE classname VALUE 'ZIAL_CL_LOG_SAP' ##NO_TEXT.
@@ -39,11 +40,12 @@ CLASS zial_cl_log_sap DEFINITION
     "! @parameter it_extnumber   | External number elements
     "! @parameter iv_log_part_id | ID for the new log as part of another log
     METHODS constructor
-      IMPORTING iv_object      TYPE balobj_d  DEFAULT zial_cl_log=>mc_default-log_object
-                iv_subobject   TYPE balsubobj DEFAULT zial_cl_log=>mc_default-log_subobject
-                iv_extnumber   TYPE balnrext  OPTIONAL
-                it_extnumber   TYPE stringtab OPTIONAL
-                iv_log_part_id TYPE i         DEFAULT 0.
+      IMPORTING iv_object           TYPE balobj_d  DEFAULT zial_cl_log=>mc_default-log_object
+                iv_subobject        TYPE balsubobj DEFAULT zial_cl_log=>mc_default-log_subobject
+                iv_extnumber        TYPE balnrext  OPTIONAL
+                it_extnumber        TYPE stringtab OPTIONAL
+                iv_log_part_id      TYPE i         DEFAULT 0
+                iv_save_continously TYPE ABAP_BOOL DEFAULT ABAP_FALSE.
 
     METHODS log_callstack.
 
@@ -70,8 +72,9 @@ CLASS zial_cl_log_sap DEFINITION
                  baluep_form TYPE baluef VALUE 'ON_CLICK_MSG_DETAIL',
                END OF mc_msgde_callback.
 
+    DATA mv_save_continously   TYPE abap_bool.
     DATA ms_processing_control TYPE s_processing_control.
-
+    
     DATA mv_is_dummy_log       TYPE abap_bool.
     DATA mv_process_bgn        TYPE timestampl.
     DATA mv_process_end        TYPE timestampl.
@@ -331,7 +334,7 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
                               iv_subobject = iv_subobject
                     IMPORTING ev_object    = DATA(lv_object)
                               ev_subobject = DATA(lv_subobject) ).
-
+    
     ms_log-hdr = VALUE #( object    = lv_object
                           subobject = lv_subobject
                           aluser    = sy-uname
@@ -345,6 +348,8 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
        AND iv_log_part_id IS NOT INITIAL.
       ms_processing_control-log_part_id = iv_log_part_id.
     ENDIF.
+
+    mv_save_continously = iv_save_continously.
 
   ENDMETHOD.
 
@@ -1302,6 +1307,13 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
                                      WHEN zial_cl_log=>mc_msgty-success THEN zial_cl_log=>mc_msgty_prio-success  " Medium important
                                      WHEN zial_cl_log=>mc_msgty-warning THEN zial_cl_log=>mc_msgty_prio-warning  " Important
                                      WHEN zial_cl_log=>mc_msgty-error   THEN zial_cl_log=>mc_msgty_prio-error ). " Very important
+
+  ENDMETHOD.
+
+
+  METHOD set_save_continously.
+
+    mv_save_continously = iv_save_continously.
 
   ENDMETHOD.
 
