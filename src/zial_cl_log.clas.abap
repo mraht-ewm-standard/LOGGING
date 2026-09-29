@@ -30,7 +30,7 @@ CLASS zial_cl_log DEFINITION
                END OF mc_log_process.
 
     CONSTANTS: BEGIN OF mc_validity_period,
-                 undef TYPE zial_de_log_validity_period VALUE -1,
+                 undef TYPE zial_de_log_validity_period VALUE 0,
                END OF mc_validity_period.
 
     CONSTANTS: BEGIN OF mc_detail_level,

@@ -34,18 +34,19 @@ CLASS zial_cl_log_sap DEFINITION
 
     "! Initialize log instance
     "!
-    "! @parameter iv_object      | Log object
-    "! @parameter iv_subobject   | Log subobject
-    "! @parameter iv_extnumber   | External number / description for a log
-    "! @parameter it_extnumber   | External number elements
-    "! @parameter iv_log_part_id | ID for the new log as part of another log
+    "! @parameter iv_object           | Log object
+    "! @parameter iv_subobject        | Log subobject
+    "! @parameter iv_extnumber        | External number / description for a log
+    "! @parameter it_extnumber        | External number elements
+    "! @parameter iv_log_part_id      | ID for the new log as part of another log
+    "! @parameter iv_save_continously | Save continously to application log
     METHODS constructor
       IMPORTING iv_object           TYPE balobj_d  DEFAULT zial_cl_log=>mc_default-log_object
                 iv_subobject        TYPE balsubobj DEFAULT zial_cl_log=>mc_default-log_subobject
                 iv_extnumber        TYPE balnrext  OPTIONAL
                 it_extnumber        TYPE stringtab OPTIONAL
                 iv_log_part_id      TYPE i         DEFAULT 0
-                iv_save_continously TYPE ABAP_BOOL DEFAULT ABAP_FALSE.
+                iv_save_continously TYPE abap_bool DEFAULT abap_false.
 
     METHODS log_callstack.
 
