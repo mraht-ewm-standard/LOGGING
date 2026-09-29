@@ -13,14 +13,24 @@ CLASS zial_cl_log_ewm DEFINITION
     ALIASES log_dm_messages FOR zial_if_log_ewm~log_dm_messages.
     ALIASES set_lgnum       FOR zial_if_log_ewm~set_lgnum.
 
+    "!
+    "! @parameter iv_lgnum            | Warehouse number
+    "! @parameter io_sap_log          | SAP log object
+    "! @parameter iv_object           | Log object
+    "! @parameter iv_subobject        | Log subobject
+    "! @parameter iv_extnumber        | External number / description for a log
+    "! @parameter it_extnumber        | External number elements
+    "! @parameter iv_log_part_id      | ID for the new log as part of another log
+    "! @parameter iv_save_continously | Save continously to application log
     METHODS constructor
-      IMPORTING iv_lgnum       TYPE /scwm/lgnum         OPTIONAL
-                io_sap_log     TYPE REF TO /scwm/cl_log OPTIONAL
-                iv_object      TYPE balobj_d            DEFAULT '/SCWM/WME'
-                iv_subobject   TYPE balsubobj           DEFAULT 'LOG_GENERAL'
-                iv_extnumber   TYPE balnrext            OPTIONAL
-                it_extnumber   TYPE stringtab           OPTIONAL
-                iv_log_part_id TYPE i                   DEFAULT 0.
+      IMPORTING iv_lgnum            TYPE /scwm/lgnum         OPTIONAL
+                io_sap_log          TYPE REF TO /scwm/cl_log OPTIONAL
+                iv_object           TYPE balobj_d            DEFAULT '/SCWM/WME'
+                iv_subobject        TYPE balsubobj           DEFAULT 'LOG_GENERAL'
+                iv_extnumber        TYPE balnrext            OPTIONAL
+                it_extnumber        TYPE stringtab           OPTIONAL
+                iv_log_part_id      TYPE i                   DEFAULT 0
+                iv_save_continously TYPE abap_bool           DEFAULT abap_false.
 
     CLASS-METHODS to_bapiret
       IMPORTING it_dm_messages       TYPE /scdl/dm_message_tab OPTIONAL
@@ -98,11 +108,12 @@ CLASS zial_cl_log_ewm IMPLEMENTATION.
 
   METHOD constructor.
 
-    super->constructor( iv_object      = iv_object
-                        iv_subobject   = iv_subobject
-                        iv_extnumber   = iv_extnumber
-                        it_extnumber   = it_extnumber
-                        iv_log_part_id = iv_log_part_id ).
+    super->constructor( iv_object           = iv_object
+                        iv_subobject        = iv_subobject
+                        iv_extnumber        = iv_extnumber
+                        it_extnumber        = it_extnumber
+                        iv_log_part_id      = iv_log_part_id
+                        iv_save_continously = iv_save_continously ).
 
     mv_lgnum   = iv_lgnum.
     mo_sap_log = io_sap_log.
