@@ -136,4 +136,10 @@ INTERFACE zial_if_log_sap
   METHODS set_save_to_appl_log
     IMPORTING iv_save_to_appl_log TYPE zial_de_log_save_to_appl_log DEFAULT abap_true.
 
+  "! <strong>[SAP]</strong> Set whether log should be saved to appl. log with each message
+  "!
+  "! @parameter iv_save_continously | Save continously to application log? (Y/N)
+  METHODS set_save_continously
+    IMPORTING iv_save_continously TYPE zial_de_log_save_continously DEFAULT abap_true.
+
 ENDINTERFACE.
