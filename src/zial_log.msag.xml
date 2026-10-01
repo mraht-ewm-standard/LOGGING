@@ -146,6 +146,18 @@
      <MSGNR>022</MSGNR>
      <TEXT>***** &amp;1 at &amp;2 *****</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZIAL_LOG</ARBGB>
+     <MSGNR>023</MSGNR>
+     <TEXT>Callstack (See message details)</TEXT>
+    </T100>   
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZIAL_LOG</ARBGB>
+     <MSGNR>024</MSGNR>
+     <TEXT>An unspecified error was raised!</TEXT>
+    </T100>     
    </T100>
    <I18N_LANGS>
     <LANGU>D</LANGU>
@@ -273,6 +285,16 @@
      <MSGNR>022</MSGNR>
      <TEXT>***** &amp;1 um &amp;2 *****</TEXT>
     </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>023</MSGNR>
+     <TEXT>Callstack (Siehe Nachrichtendetails)</TEXT>
+    </item>
+    <item>
+     <SPRSL>D</SPRSL>
+     <MSGNR>024</MSGNR>
+     <TEXT>Ein unspezifischer Fehler wurde geworfen!</TEXT>
+    </item>    
    </T100_TEXTS>
   </asx:values>
  </asx:abap>
