@@ -216,6 +216,19 @@ CLASS zial_cl_log DEFINITION
                 it_bapiret         TYPE bapiret2_t OPTIONAL
       RETURNING VALUE(rs_bapiret) TYPE bapiret2.
 
+    CLASS-METHODS raise_exception
+      IMPORTING iv_msgid     TYPE symsgid        DEFAULT sy-msgid
+                iv_msgty     TYPE symsgty        DEFAULT sy-msgty
+                iv_msgno     TYPE symsgno        DEFAULT sy-msgno
+                iv_msgtx     TYPE clike          OPTIONAL
+                iv_msgv1     TYPE clike          DEFAULT sy-msgv1
+                iv_msgv2     TYPE clike          DEFAULT sy-msgv2
+                iv_msgv3     TYPE clike          DEFAULT sy-msgv3
+                iv_msgv4     TYPE clike          DEFAULT sy-msgv4
+                io_exception TYPE REF TO cx_root OPTIONAL
+                it_bapiret   TYPE bapiret2_t     OPTIONAL
+      RAISING   zcx_error.
+
     CLASS-METHODS is_valid_log_object
       IMPORTING iv_object        TYPE balobj_d
       RETURNING VALUE(rv_result) TYPE abap_bool.
@@ -402,6 +415,37 @@ CLASS zial_cl_log IMPLEMENTATION.
       rv_result = abap_true.
       EXIT.
     ENDLOOP.
+
+  ENDMETHOD.
+
+
+  METHOD raise_exception.
+
+    DATA(lt_bapiret) = VALUE bapiret2_t( ).
+    IF it_bapiret IS SUPPLIED.
+
+      lt_bapiret = it_bapiret.
+
+    ELSE.
+
+      lt_bapiret = zdgl_cl_log_msg=>to_bapirets( iv_msgid     = iv_msgid
+                                                 iv_msgty     = iv_msgty
+                                                 iv_msgno     = iv_msgno
+                                                 iv_msgtx     = iv_msgtx
+                                                 iv_msgv1     = iv_msgv1
+                                                 iv_msgv2     = iv_msgv2
+                                                 iv_msgv3     = iv_msgv3
+                                                 iv_msgv4     = iv_msgv4
+                                                 io_exception = io_exception ).
+
+    ENDIF.
+
+    IF lt_bapiret IS INITIAL.
+      MESSAGE e024 INTO DATA(lv_msgtx) ##NEEDED.
+      INSERT to_bapiret( ) INTO TABLE lt_bapiret.
+    ENDIF.
+
+    RAISE EXCEPTION NEW zcx_error( messages = lt_bapiret ).
 
   ENDMETHOD.
 
