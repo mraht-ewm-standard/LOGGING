@@ -212,8 +212,8 @@ CLASS zial_cl_log DEFINITION
       RETURNING VALUE(rv_result)  TYPE abap_bool.
 
     CLASS-METHODS get_last_error
-      IMPORTING io_exception       TYPE REF TO cx_root OPTIONAL
-                it_bapiret         TYPE bapiret2_t OPTIONAL
+      IMPORTING io_exception      TYPE REF TO cx_root OPTIONAL
+                it_bapiret        TYPE bapiret2_t     OPTIONAL
       RETURNING VALUE(rs_bapiret) TYPE bapiret2.
 
     CLASS-METHODS raise_exception
@@ -428,7 +428,7 @@ CLASS zial_cl_log IMPLEMENTATION.
 
     ELSE.
 
-      lt_bapiret = zdgl_cl_log_msg=>to_bapirets( iv_msgid     = iv_msgid
+      lt_bapiret = zial_cl_log_msg=>to_bapirets( iv_msgid     = iv_msgid
                                                  iv_msgty     = iv_msgty
                                                  iv_msgno     = iv_msgno
                                                  iv_msgtx     = iv_msgtx
