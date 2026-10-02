@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_MSAG" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
@@ -151,13 +151,13 @@
      <ARBGB>ZIAL_LOG</ARBGB>
      <MSGNR>023</MSGNR>
      <TEXT>Callstack (See message details)</TEXT>
-    </T100>   
+    </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>ZIAL_LOG</ARBGB>
      <MSGNR>024</MSGNR>
      <TEXT>An unspecified error was raised!</TEXT>
-    </T100>     
+    </T100>
    </T100>
    <I18N_LANGS>
     <LANGU>D</LANGU>
@@ -294,7 +294,7 @@
      <SPRSL>D</SPRSL>
      <MSGNR>024</MSGNR>
      <TEXT>Ein unspezifischer Fehler wurde geworfen!</TEXT>
-    </item>    
+    </item>
    </T100_TEXTS>
   </asx:values>
  </asx:abap>
