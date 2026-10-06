@@ -253,7 +253,8 @@ CLASS zial_cl_log_msg IMPLEMENTATION.
           rs_bapiret = to_bapiret( iv_msgtx = CONV #( io_exception->get_text( ) ) ).
 
         WHEN OTHERS.
-          RETURN.
+          DATA(lt_bapiret) = zcx_root=>get_messages_ext( io_exception ).
+          rs_bapiret = VALUE #( lt_bapiret[ 1 ] OPTIONAL ).
 
       ENDCASE.
 
@@ -296,7 +297,7 @@ CLASS zial_cl_log_msg IMPLEMENTATION.
           rt_bapiret = VALUE #( ( to_bapiret( iv_msgtx = CONV #( io_exception->get_text( ) ) ) ) ).
 
         WHEN OTHERS.
-          RETURN.
+          rt_bapiret = zcx_root=>get_messages_ext( io_exception ).
 
       ENDCASE.
 
