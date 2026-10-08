@@ -3,6 +3,8 @@ CLASS zial_cl_log_conf DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
+    TYPES r_log_instance TYPE REF TO zial_cl_log_ewm.
+
     CONSTANTS: BEGIN OF mc_default,
                  "! Not configurable as SAP standard defines the maximum number of
                  "! entries hardcoded in include SBAL_CONSTANTS, CONST_BAL_MSGNUMBER_MAX
@@ -85,8 +87,5 @@ CLASS zial_cl_log_conf IMPLEMENTATION.
       INTO TABLE @mt_log_conf.
 
   ENDMETHOD.
-
-
-
 
 ENDCLASS.
