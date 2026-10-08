@@ -195,7 +195,11 @@ CLASS zial_cl_log_msg IMPLEMENTATION.
 
     ENDWHILE.
 
-    IF lv_msgtx IS NOT INITIAL.
+    IF     lv_msgtx IS NOT INITIAL
+       AND lv_msgv1 IS INITIAL
+       AND lv_msgv2 IS INITIAL
+       AND lv_msgv3 IS INITIAL
+       AND lv_msgv4 IS INITIAL.
       DATA(ls_msgtx) = CONV s_msgtx( lv_msgtx ).
       lv_msgv1 = ls_msgtx-part1.
       lv_msgv2 = ls_msgtx-part2.
