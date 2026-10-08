@@ -9,6 +9,7 @@ CLASS zial_cl_log_msg DEFINITION
                  msgty TYPE symsgty VALUE 'I',
                END OF mc_default.
 
+  PROTECTED SECTION.
     "! Convert bapiret structure to message string
     "!
     "! @parameter iv_msgid   | Message ID
@@ -69,7 +70,6 @@ CLASS zial_cl_log_msg DEFINITION
                 io_exception      TYPE REF TO cx_root OPTIONAL
       RETURNING VALUE(rt_bapiret) TYPE bapiret2_t.
 
-  PROTECTED SECTION.
     CLASS-METHODS harmonize_msg
       IMPORTING iv_msgid   TYPE symsgid
                 iv_msgno   TYPE symsgno
@@ -82,7 +82,6 @@ CLASS zial_cl_log_msg DEFINITION
                 is_bapiret TYPE bapiret2 OPTIONAL
       EXPORTING ev_msgtx   TYPE bapi_msg
                 es_symsg   TYPE symsg.
-
 ENDCLASS.
 
 
@@ -249,9 +248,6 @@ CLASS zial_cl_log_msg IMPLEMENTATION.
         WHEN TYPE zcx_if_check_class.
           rs_bapiret = CAST zcx_if_check_class( io_exception )->get_message( ).
 
-        WHEN TYPE cx_root.
-          rs_bapiret = to_bapiret( iv_msgtx = CONV #( io_exception->get_text( ) ) ).
-
         WHEN OTHERS.
           DATA(lt_bapiret) = zcx_root=>get_messages_ext( io_exception ).
           rs_bapiret = VALUE #( lt_bapiret[ 1 ] OPTIONAL ).
@@ -293,9 +289,6 @@ CLASS zial_cl_log_msg IMPLEMENTATION.
         WHEN TYPE zcx_if_check_class.
           rt_bapiret = CAST zcx_if_check_class( io_exception )->get_messages( ).
 
-        WHEN TYPE cx_root.
-          rt_bapiret = VALUE #( ( to_bapiret( iv_msgtx = CONV #( io_exception->get_text( ) ) ) ) ).
-
         WHEN OTHERS.
           rt_bapiret = zcx_root=>get_messages_ext( io_exception ).
 
@@ -314,11 +307,13 @@ CLASS zial_cl_log_msg IMPLEMENTATION.
 
     ENDIF.
 
-    LOOP AT rt_bapiret ASSIGNING FIELD-SYMBOL(<ls_bapiret>) WHERE system IS INITIAL.
-      CALL FUNCTION 'OWN_LOGICAL_SYSTEM_GET_STABLE'
-        IMPORTING  own_logical_system = <ls_bapiret>-system
-        EXCEPTIONS OTHERS             = 0.
-    ENDLOOP.
+    DATA(lv_own_logical_system) = VALUE logsys( ).
+    CALL FUNCTION 'OWN_LOGICAL_SYSTEM_GET_STABLE'
+      IMPORTING  own_logical_system = lv_own_logical_system
+      EXCEPTIONS OTHERS             = 0.
+
+    MODIFY rt_bapiret FROM VALUE #( system = lv_own_logical_system )
+           TRANSPORTING system WHERE system IS INITIAL.
 
   ENDMETHOD.
 

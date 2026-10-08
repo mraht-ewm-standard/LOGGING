@@ -49,6 +49,8 @@ CLASS zial_cl_log DEFINITION
 
     CONSTANTS: BEGIN OF mc_msgty,
                  any_error TYPE char3   VALUE 'EAX',
+                 abort     TYPE symsgty VALUE 'A',
+                 exit      TYPE symsgty VALUE 'X',
                  error     TYPE symsgty VALUE 'E',
                  warning   TYPE symsgty VALUE 'W',
                  success   TYPE symsgty VALUE 'S',
@@ -215,6 +217,13 @@ CLASS zial_cl_log DEFINITION
       IMPORTING io_exception      TYPE REF TO cx_root OPTIONAL
                 it_bapiret        TYPE bapiret2_t     OPTIONAL
       RETURNING VALUE(rs_bapiret) TYPE bapiret2.
+
+    CLASS-METHODS get_by_msgty
+      IMPORTING it_bapiret        TYPE bapiret2_t
+                iv_success        TYPE abap_bool DEFAULT abap_false
+                iv_warning        TYPE abap_bool DEFAULT abap_false
+                iv_error          TYPE abap_bool DEFAULT abap_false
+      RETURNING VALUE(rt_bapiret) TYPE bapiret2_t.
 
     CLASS-METHODS raise_exception
       IMPORTING iv_msgid     TYPE symsgid        DEFAULT sy-msgid
@@ -415,6 +424,40 @@ CLASS zial_cl_log IMPLEMENTATION.
       rv_result = abap_true.
       EXIT.
     ENDLOOP.
+
+  ENDMETHOD.
+
+
+  METHOD get_by_msgty.
+
+    DATA(lt_r_msgty) = VALUE rseloption( ).
+    IF iv_success EQ abap_true.
+      INSERT VALUE #( sign   = 'I'
+                      option = 'EQ'
+                      low    = mc_msgty-success ) INTO TABLE lt_r_msgty.
+    ENDIF.
+
+    IF iv_warning EQ abap_true.
+      INSERT VALUE #( sign   = 'I'
+                      option = 'EQ'
+                      low    = mc_msgty-warning ) INTO TABLE lt_r_msgty.
+    ENDIF.
+
+    IF iv_error EQ abap_true.
+      INSERT LINES OF VALUE rseloption( sign   = 'I'
+                                        option = 'EQ'
+                                        ( low = mc_msgty-error )
+                                        ( low = mc_msgty-abort )
+                                        ( low = mc_msgty-exit ) ) INTO TABLE lt_r_msgty.
+    ENDIF.
+
+    IF lt_r_msgty IS INITIAL.
+      rt_bapiret = it_bapiret.
+    ELSE.
+      LOOP AT it_bapiret ASSIGNING FIELD-SYMBOL(<ls_bapiret>) WHERE type IN lt_r_msgty.
+        INSERT <ls_bapiret> INTO TABLE rt_bapiret.
+      ENDLOOP.
+    ENDIF.
 
   ENDMETHOD.
 
@@ -643,7 +686,7 @@ CLASS zial_cl_log IMPLEMENTATION.
                                                iv_msgv2     = iv_msgv2
                                                iv_msgv3     = iv_msgv3
                                                iv_msgv4     = iv_msgv4
-                                               io_exception = io_exception ).
+                                               io_exception = io_exception  ).
 
   ENDMETHOD.
 
