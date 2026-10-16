@@ -72,17 +72,19 @@ CLASS zial_cl_log DEFINITION
 
     "! Create new log instance
     "!
-    "! @parameter iv_object    | Log object
-    "! @parameter iv_subobject | Log subobject
-    "! @parameter iv_extnumber | External number / description for a log
-    "! @parameter it_extnumber | External number elements
-    "! @parameter ro_instance  | Log instance
+    "! @parameter iv_object           | Log object
+    "! @parameter iv_subobject        | Log subobject
+    "! @parameter iv_extnumber        | External number / description for a log
+    "! @parameter it_extnumber        | External number elements
+    "! @parameter iv_save_continously | Save messages continously to appl. log
+    "! @parameter ro_instance         | Log instance
     CLASS-METHODS create
-      IMPORTING iv_object          TYPE balobj_d  DEFAULT mc_default-log_object
-                iv_subobject       TYPE balsubobj DEFAULT mc_default-log_subobject
-                iv_extnumber       TYPE balnrext  OPTIONAL
-                it_extnumber       TYPE stringtab OPTIONAL
-      RETURNING VALUE(ro_instance) TYPE zial_cl_log_conf=>r_log_instance.
+      IMPORTING iv_object           TYPE balobj_d  DEFAULT mc_default-log_object
+                iv_subobject        TYPE balsubobj DEFAULT mc_default-log_subobject
+                iv_extnumber        TYPE balnrext  OPTIONAL
+                it_extnumber        TYPE stringtab OPTIONAL
+                iv_save_continously TYPE abap_bool DEFAULT abap_false
+      RETURNING VALUE(ro_instance)  TYPE zdgl_cl_log_conf=>r_log_instance.
 
     CLASS-METHODS delete
       IMPORTING iv_log_handle TYPE balloghndl.
@@ -309,11 +311,12 @@ CLASS zial_cl_log IMPLEMENTATION.
 
     backup_sy_msg( ).
 
-    mo_instance = NEW #( iv_object    = iv_object
-                         iv_subobject = iv_subobject
-                         iv_extnumber = iv_extnumber
-                         it_extnumber = it_extnumber ).
-    zial_cl_log_stack=>push( mo_instance ).
+    mo_instance = NEW #( iv_object           = iv_object
+                         iv_subobject        = iv_subobject
+                         iv_extnumber        = iv_extnumber
+                         it_extnumber        = it_extnumber
+                         iv_save_continously = iv_save_continously ).
+    zdgl_cl_log_stack=>push( mo_instance ).
 
     recover_sy_msg( ).
 
