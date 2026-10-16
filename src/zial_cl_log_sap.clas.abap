@@ -76,7 +76,6 @@ CLASS zial_cl_log_sap DEFINITION
     DATA mv_save_continously   TYPE abap_bool.
     DATA ms_processing_control TYPE s_processing_control.
 
-    DATA mv_is_dummy_log       TYPE abap_bool.
     DATA mv_process_bgn        TYPE timestampl.
     DATA mv_process_end        TYPE timestampl.
     DATA mv_caller             TYPE c LENGTH 200.
@@ -1321,7 +1320,10 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
   METHOD is_dummy_log.
 
-    rv_result = mv_is_dummy_log.
+    IF     ms_log-hdr-object    EQ zdgl_cl_log=>mc_default-log_object
+       AND ms_log-hdr-subobject EQ zdgl_cl_log=>mc_default-log_subobject.
+      rv_result = abap_true.
+    ENDIF.
 
   ENDMETHOD.
 
