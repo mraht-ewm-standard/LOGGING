@@ -1320,8 +1320,8 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
   METHOD is_dummy_log.
 
-    IF     ms_log-hdr-object    EQ zdgl_cl_log=>mc_default-log_object
-       AND ms_log-hdr-subobject EQ zdgl_cl_log=>mc_default-log_subobject.
+    IF     ms_log-hdr-object    EQ zial_cl_log=>mc_default-log_object
+       AND ms_log-hdr-subobject EQ zial_cl_log=>mc_default-log_subobject.
       rv_result = abap_true.
     ENDIF.
 
