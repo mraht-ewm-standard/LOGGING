@@ -17,8 +17,11 @@ CLASS zial_cl_log_sap DEFINITION
     ALIASES log_caller              FOR zial_if_log_sap~log_caller.
     ALIASES log_attr                FOR zial_if_log_sap~log_attr.
     ALIASES has_error               FOR zial_if_log_sap~has_error.
+    ALIASES get_last_error          FOR zial_if_log_sap~get_last_error.
+    ALIASES get_messages_by_msgty   FOR zial_if_log_sap~get_messages_by_msgty.
     ALIASES save                    FOR zial_if_log_sap~save.
     ALIASES set_extnumber           FOR zial_if_log_sap~set_extnumber.
+    ALIASES set_settings            FOR zial_if_log_sap~set_settings.
     ALIASES set_detail_level        FOR zial_if_log_sap~set_detail_level.
     ALIASES set_expiry_date         FOR zial_if_log_sap~set_expiry_date.
     ALIASES set_level_log_callstack FOR zial_if_log_sap~set_level_log_callstack.
@@ -34,19 +37,17 @@ CLASS zial_cl_log_sap DEFINITION
 
     "! Initialize log instance
     "!
-    "! @parameter iv_object           | Log object
-    "! @parameter iv_subobject        | Log subobject
-    "! @parameter iv_extnumber        | External number / description for a log
-    "! @parameter it_extnumber        | External number elements
-    "! @parameter iv_log_part_id      | ID for the new log as part of another log
-    "! @parameter iv_save_continously | Save continously to application log
+    "! @parameter iv_object      | Log object
+    "! @parameter iv_subobject   | Log subobject
+    "! @parameter iv_extnumber   | External number / description for a log
+    "! @parameter it_extnumber   | External number elements
+    "! @parameter iv_log_part_id | ID for the new log as part of another log
     METHODS constructor
-      IMPORTING iv_object           TYPE balobj_d  DEFAULT zial_cl_log=>mc_default-log_object
-                iv_subobject        TYPE balsubobj DEFAULT zial_cl_log=>mc_default-log_subobject
-                iv_extnumber        TYPE balnrext  OPTIONAL
-                it_extnumber        TYPE stringtab OPTIONAL
-                iv_log_part_id      TYPE i         DEFAULT 0
-                iv_save_continously TYPE abap_bool DEFAULT abap_false.
+      IMPORTING iv_object      TYPE balobj_d  DEFAULT zial_cl_log=>mc_default-log_object
+                iv_subobject   TYPE balsubobj DEFAULT zial_cl_log=>mc_default-log_subobject
+                iv_extnumber   TYPE balnrext  OPTIONAL
+                it_extnumber   TYPE stringtab OPTIONAL
+                iv_log_part_id TYPE i         DEFAULT 0.
 
     METHODS log_callstack.
 
@@ -73,13 +74,13 @@ CLASS zial_cl_log_sap DEFINITION
                  baluep_form TYPE baluef VALUE 'ON_CLICK_MSG_DETAIL',
                END OF mc_msgde_callback.
 
-    DATA mv_save_continously   TYPE abap_bool.
     DATA ms_processing_control TYPE s_processing_control.
 
+    DATA mv_save_continously   TYPE abap_bool.
     DATA mv_process_bgn        TYPE timestampl.
     DATA mv_process_end        TYPE timestampl.
     DATA mv_caller             TYPE c LENGTH 200.
-    DATA mt_bapiret2           TYPE bapiret2_t.
+    DATA mt_bapiret           TYPE bapiret2_t.
 
     DATA ms_log                TYPE zial_s_log.
 
@@ -277,7 +278,7 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
                                         iv_msgv1 = ms_log-msg-msgv1
                                         iv_msgv2 = ms_log-msg-msgv2
                                         iv_msgv3 = ms_log-msg-msgv3
-                                        iv_msgv4 = ms_log-msg-msgv4 ) INTO TABLE mt_bapiret2.
+                                        iv_msgv4 = ms_log-msg-msgv4 ) INTO TABLE mt_bapiret.
 
       WHEN abap_false.
         handle_error( iv_process = zial_cl_log=>mc_log_process-add_msg
@@ -349,8 +350,6 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
       ms_processing_control-log_part_id = iv_log_part_id.
     ENDIF.
 
-    mv_save_continously = iv_save_continously.
-
   ENDMETHOD.
 
 
@@ -417,6 +416,10 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
     ENDIF.
 
     add_msg_to_appl_log( ).
+
+    IF mv_save_continously EQ abap_true.
+      save( iv_finalize = abap_false ).
+    ENDIF.
 
   ENDMETHOD.
 
@@ -539,7 +542,7 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
   METHOD get_messages.
 
-    rt_messages = mt_bapiret2.
+    rt_messages = mt_bapiret.
 
   ENDMETHOD.
 
@@ -609,6 +612,23 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
   ENDMETHOD.
 
 
+    METHOD get_last_error.
+
+    rs_bapiret = zial_cl_log=>get_last_error( it_bapiret = mt_bapiret ).
+
+  ENDMETHOD.
+
+
+  METHOD get_messages_by_msgty.
+
+    rt_bapiret = zial_cl_log=>get_messages_by_msgty( it_bapiret = mt_bapiret
+                                                     iv_success = iv_success
+                                                     iv_warning = iv_warning
+                                                     iv_error   = iv_error ).
+
+  ENDMETHOD.
+
+
   METHOD has_msg_added_to_log.
 
     IF is_msg_handle IS NOT INITIAL.
@@ -649,7 +669,7 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
     " 3 log entries are reserved for internal messages
     CHECK ms_processing_control-log_part_id IS INITIAL
-      AND lines( mt_bapiret2 )              EQ ( zial_cl_log_conf=>mc_default-max_num_of_entries - 3 ).
+      AND lines( mt_bapiret )              EQ ( zial_cl_log_conf=>mc_default-max_num_of_entries - 3 ).
     rv_result = abap_true.
 
   ENDMETHOD.
@@ -945,7 +965,7 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
       log_message( ).
     ENDIF.
 
-    IF     lines( mt_bapiret2 ) GT 0
+    IF     lines( mt_bapiret ) GT 0
        AND (    ms_processing_control-has_error  EQ abap_false
              OR ms_processing_control-save_error EQ abap_true ).
 
@@ -965,6 +985,8 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
       zial_cl_log=>delete( ms_log-hdr-log_handle ).
 
     ENDIF.
+
+    zial_cl_log=>mt_bapiret2_prev_log = get_messages( ).
 
   ENDMETHOD.
 
@@ -1053,10 +1075,10 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
       CASE sy-index.
         WHEN 1.
-          IF iv_level IS NOT SUPPLIED.
+          IF iv_level_log_callstack IS NOT SUPPLIED.
             CONTINUE.
           ENDIF.
-          ms_log-hdr-level_log_callstack = iv_level.
+          ms_log-hdr-level_log_callstack = iv_level_log_callstack.
 
         WHEN 2.
           DATA(ls_log_conf) = zial_cl_log_conf=>get( iv_object    = ms_log-hdr-object
@@ -1184,6 +1206,31 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
     INSERT VALUE #( v_id              = mv_msg_param_id
                     t_input_parameter = it_msgde ) INTO TABLE mt_msg_details.
+
+  ENDMETHOD.
+
+
+  METHOD set_settings.
+
+    IF iv_detail_level IS SUPPLIED.
+      set_detail_level( iv_detail_level ).
+    ENDIF.
+
+    IF iv_level_log_callstack IS SUPPLIED.
+      set_level_log_callstack( iv_level_log_callstack ).
+    ENDIF.
+
+    IF iv_save_continously IS SUPPLIED.
+      set_save_continously( iv_save_continously ).
+    ENDIF.
+
+    IF iv_save_to_appl_log IS SUPPLIED.
+      set_save_to_appl_log( iv_save_to_appl_log ).
+    ENDIF.
+
+    IF iv_validity_period IS SUPPLIED.
+      set_expiry_date( iv_validity_period ).
+    ENDIF.
 
   ENDMETHOD.
 
@@ -1320,8 +1367,8 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
   METHOD is_dummy_log.
 
-    IF     ms_log-hdr-object    EQ zdgl_cl_log=>mc_default-log_object
-       AND ms_log-hdr-subobject EQ zdgl_cl_log=>mc_default-log_subobject.
+    IF     ms_log-hdr-object    EQ zial_cl_log=>mc_default-log_object
+       AND ms_log-hdr-subobject EQ zial_cl_log=>mc_default-log_subobject.
       rv_result = abap_true.
     ENDIF.
 

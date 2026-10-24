@@ -83,7 +83,7 @@ CLASS ltc_log IMPLEMENTATION.
 
     DATA(lo_log) = CAST zial_cl_log_sap( zial_cl_log=>get( ) ).
     DO zial_cl_log_conf=>mc_default-max_num_of_entries - 4 TIMES.
-      INSERT VALUE #( ) INTO TABLE lo_log->mt_bapiret2.
+      INSERT VALUE #( ) INTO TABLE lo_log->mt_bapiret.
     ENDDO.
 
     zial_cl_log=>get( )->log_message( iv_msgty = zial_cl_log=>mc_msgty-info
