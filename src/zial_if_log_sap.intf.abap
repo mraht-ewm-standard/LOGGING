@@ -99,6 +99,24 @@ INTERFACE zial_if_log_sap
   METHODS has_error
     RETURNING VALUE(rv_result) TYPE abap_bool.
 
+  "! <strong>[SAP]</strong> Get last error message
+  "!
+  "! @parameter rs_bapiret | Error message
+  METHODS get_last_error
+    RETURNING VALUE(rs_bapiret) TYPE bapiret2.
+
+  "! <strong>[SAP]</strong> Get messages by type
+  "!
+  "! @parameter iv_success | Select success messages
+  "! @parameter iv_warning | Select warning messages
+  "! @parameter iv_error   | Select error messages
+  "! @parameter rt_bapiret | Messages
+  METHODS get_messages_by_msgty
+    IMPORTING iv_success        TYPE abap_bool DEFAULT abap_false
+              iv_warning        TYPE abap_bool DEFAULT abap_false
+              iv_error          TYPE abap_bool DEFAULT abap_false
+    RETURNING VALUE(rt_bapiret) TYPE bapiret2_t.
+
   "! <strong>[SAP]</strong> Save log to application log and optionally close log instance
   "!
   "! @parameter iv_finalize | Finalize/close log? (Y/N)
@@ -126,9 +144,9 @@ INTERFACE zial_if_log_sap
 
   "! <strong>[SAP]</strong> Set level of message type for which callstack is being logged
   "!
-  "! @parameter iv_level | Level of message type
+  "! @parameter iv_level_log_callstack | Level of message type
   METHODS set_level_log_callstack
-    IMPORTING iv_level TYPE zial_de_log_detail_level OPTIONAL.
+    IMPORTING iv_level_log_callstack TYPE zial_de_log_detail_level OPTIONAL.
 
   "! <strong>[SAP]</strong> Set whether log should be saved to appl. log
   "!
@@ -141,5 +159,19 @@ INTERFACE zial_if_log_sap
   "! @parameter iv_save_continously | Save continously to application log? (Y/N)
   METHODS set_save_continously
     IMPORTING iv_save_continously TYPE zial_de_log_save_continously DEFAULT abap_true.
+
+  "! <strong>[SAP]</strong> Set log settings
+  "!
+  "! @parameter iv_detail_level        | <p class="shorttext synchronized">Set log detail level</p>
+  "! @parameter iv_validity_period     | <p class="shorttext synchronized">Set expiry date of log</p>
+  "! @parameter iv_level_log_callstack | <p class="shorttext synchronized">Set level of message type for which callstack is being logged</p>
+  "! @parameter iv_save_to_appl_log    | <p class="shorttext synchronized">Set whether log should be saved to appl. log</p>
+  "! @parameter iv_save_continously    | <p class="shorttext synchronized">Set whether log should be saved to appl. log with each message</p>
+  METHODS set_settings
+    IMPORTING iv_detail_level        TYPE zial_de_log_detail_level     OPTIONAL
+              iv_validity_period     TYPE zial_de_log_validity_period  OPTIONAL
+              iv_level_log_callstack TYPE zial_de_log_detail_level     OPTIONAL
+              iv_save_to_appl_log    TYPE zial_de_log_save_to_appl_log OPTIONAL
+              iv_save_continously    TYPE zial_de_log_save_continously OPTIONAL.
 
 ENDINTERFACE.
