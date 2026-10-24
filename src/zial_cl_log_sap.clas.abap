@@ -80,7 +80,7 @@ CLASS zial_cl_log_sap DEFINITION
     DATA mv_process_bgn        TYPE timestampl.
     DATA mv_process_end        TYPE timestampl.
     DATA mv_caller             TYPE c LENGTH 200.
-    DATA mt_bapiret           TYPE bapiret2_t.
+    DATA mt_bapiret            TYPE bapiret2_t.
 
     DATA ms_log                TYPE zial_s_log.
 
@@ -612,7 +612,7 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
   ENDMETHOD.
 
 
-    METHOD get_last_error.
+  METHOD get_last_error.
 
     rs_bapiret = zial_cl_log=>get_last_error( it_bapiret = mt_bapiret ).
 
@@ -621,10 +621,10 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
   METHOD get_messages_by_msgty.
 
-    rt_bapiret = zial_cl_log=>get_messages_by_msgty( it_bapiret = mt_bapiret
-                                                     iv_success = iv_success
-                                                     iv_warning = iv_warning
-                                                     iv_error   = iv_error ).
+    rt_bapiret = zial_cl_log=>get_messages_by_type( it_bapiret = mt_bapiret
+                                                    iv_success = iv_success
+                                                    iv_warning = iv_warning
+                                                    iv_error   = iv_error ).
 
   ENDMETHOD.
 
@@ -669,7 +669,7 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
 
     " 3 log entries are reserved for internal messages
     CHECK ms_processing_control-log_part_id IS INITIAL
-      AND lines( mt_bapiret )              EQ ( zial_cl_log_conf=>mc_default-max_num_of_entries - 3 ).
+      AND lines( mt_bapiret )               EQ ( zial_cl_log_conf=>mc_default-max_num_of_entries - 3 ).
     rv_result = abap_true.
 
   ENDMETHOD.
