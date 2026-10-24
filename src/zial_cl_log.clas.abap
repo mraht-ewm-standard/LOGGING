@@ -219,13 +219,17 @@ CLASS zial_cl_log DEFINITION
     CLASS-METHODS get_last_error
       IMPORTING io_exception      TYPE REF TO cx_root OPTIONAL
                 it_bapiret        TYPE bapiret2_t     OPTIONAL
+                PREFERRED PARAMETER it_bapiret
       RETURNING VALUE(rs_bapiret) TYPE bapiret2.
 
-    CLASS-METHODS get_by_msgty
+    CLASS-METHODS get_messages_by_type
       IMPORTING it_bapiret        TYPE bapiret2_t
                 iv_success        TYPE abap_bool DEFAULT abap_false
                 iv_warning        TYPE abap_bool DEFAULT abap_false
                 iv_error          TYPE abap_bool DEFAULT abap_false
+      RETURNING VALUE(rt_bapiret) TYPE bapiret2_t.
+
+    CLASS-METHODS get_messages_prev_log
       RETURNING VALUE(rt_bapiret) TYPE bapiret2_t.
 
     CLASS-METHODS raise_exception
@@ -254,13 +258,14 @@ CLASS zial_cl_log DEFINITION
     CONSTANTS mc_msg_ident          TYPE c LENGTH 9 VALUE 'MSG_IDENT' ##NO_TEXT.
     CONSTANTS mc_log_context_struct TYPE baltabname VALUE 'ZIAL_S_LOG_CONTEXT' ##NO_TEXT.
 
+    CLASS-DATA mo_instance              TYPE zial_cl_log_conf=>r_log_instance.
+
     CLASS-DATA mo_gui_docking_container TYPE REF TO cl_gui_docking_container.
     CLASS-DATA mo_gui_alv_grid          TYPE REF TO cl_gui_alv_grid.
     CLASS-DATA mv_sel_msg_param_id      TYPE de_message_param_id.
     CLASS-DATA mv_log_part_id           TYPE i.
     CLASS-DATA ms_symsg                 TYPE symsg.
-
-    CLASS-DATA mo_instance              TYPE zial_cl_log_conf=>r_log_instance.
+    CLASS-DATA mt_bapiret2_prev_log     TYPE bapiret2_t.
 
     CLASS-METHODS harmonize_msg
       IMPORTING iv_msgid   TYPE symsgid
@@ -360,7 +365,6 @@ CLASS zial_cl_log IMPLEMENTATION.
       mo_instance = create( iv_object    = mc_default-log_object
                             iv_subobject = mc_default-log_subobject
                             iv_extnumber = CONV #( TEXT-001 ) ).
-      mo_instance->mv_is_dummy_log = abap_true.
     ENDIF.
 
     ro_instance = mo_instance.
@@ -407,9 +411,21 @@ CLASS zial_cl_log IMPLEMENTATION.
       lt_bapiret = to_bapirets( io_exception = io_exception ).
     ENDIF.
 
-    LOOP AT lt_bapiret INTO rs_bapiret WHERE type CA mc_msgty-any_error.
+    DATA(lv_lines) = lines( lt_bapiret ).
+    DO lv_lines TIMES.
+
+      DATA(lv_index) = lv_lines - sy-index + 1.
+      ASSIGN lt_bapiret[ lv_index ] TO FIELD-SYMBOL(<ls_bapiret>).
+      IF <ls_bapiret> IS NOT ASSIGNED.
+        EXIT.
+      ELSEIF <ls_bapiret>-type CN mc_msgty-any_error.
+        CONTINUE.
+      ENDIF.
+
+      rs_bapiret = <ls_bapiret>.
       EXIT.
-    ENDLOOP.
+
+    ENDDO.
 
   ENDMETHOD.
 
@@ -431,14 +447,7 @@ CLASS zial_cl_log IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD exists_log_instance.
-
-    rv_result = xsdbool( NOT zial_cl_log_stack=>is_empty( ) ).
-
-  ENDMETHOD.
-
-
-  METHOD get_by_msgty.
+  METHOD get_messages_by_type.
 
     DATA(lt_r_msgty) = VALUE rseloption( ).
     IF iv_success EQ abap_true.
@@ -468,6 +477,20 @@ CLASS zial_cl_log IMPLEMENTATION.
         INSERT <ls_bapiret> INTO TABLE rt_bapiret.
       ENDLOOP.
     ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD get_messages_prev_log.
+
+    rt_bapiret = mt_bapiret2_prev_log.
+
+  ENDMETHOD.
+
+
+  METHOD exists_log_instance.
+
+    rv_result = xsdbool( NOT zial_cl_log_stack=>is_empty( ) ).
 
   ENDMETHOD.
 
