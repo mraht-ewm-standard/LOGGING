@@ -19,6 +19,13 @@
     <TCODE>ZIAL_SLG1</TCODE>
     <TTEXT>Application Log</TTEXT>
    </TSTCT>
+   <HEAD>
+    <NAME>ZIAL_SLG1</NAME>
+    <TYPE>TR</TYPE>
+    <DISPLAY_NAME>ZIAL_SLG1</DISPLAY_NAME>
+    <STEXT>Report Transaction</STEXT>
+    <CTYPE>R</CTYPE>
+   </HEAD>
   </asx:values>
  </asx:abap>
 </abapGit>
