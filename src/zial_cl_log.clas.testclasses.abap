@@ -28,6 +28,7 @@ CLASS ltc_log DEFINITION FINAL
     METHODS t0003 FOR TESTING RAISING cx_static_check.
     METHODS t0004 FOR TESTING RAISING cx_static_check.
     METHODS t0005 FOR TESTING RAISING cx_static_check.
+    METHODS t0006 FOR TESTING RAISING cx_static_check.
 
 ENDCLASS.
 
@@ -141,6 +142,52 @@ CLASS ltc_log IMPLEMENTATION.
                                                                                ( fnam = 'NLPLA' ) ) ).
     cl_abap_unit_assert=>assert_equals( exp = |LGNUM, HUID, RSRC, NLPLA|
                                         act = lv_act_components ).
+
+  ENDMETHOD.
+
+
+  METHOD t0006.
+
+    CHECK mo_aunit->is_active( abap_true ).
+
+    MESSAGE s499(sy) WITH 'LGNUM' 'TEST1' 'RSRC' 'NLPLA' INTO DATA(lv_exp_msgtx) ##NEEDED.
+    zial_cl_log=>get( )->log_message( it_msgde = VALUE #( ( fnam = 'TEST1' low = '1234' ) ) ).
+
+    MESSAGE w499(sy) WITH 'LGNUM' 'TEST2' 'RSRC' 'NLPLA' INTO lv_exp_msgtx ##NEEDED.
+    zial_cl_log=>get( )->log_message( it_msgde = VALUE #( ( fnam = 'TEST2' low = '2345' ) ) ).
+
+    MESSAGE s499(sy) WITH 'LGNUM' 'TEST3' 'RSRC' 'NLPLA' INTO lv_exp_msgtx ##NEEDED.
+    zial_cl_log=>get( )->log_message( ).
+
+    MESSAGE e499(sy) WITH 'LGNUM' 'TEST4' 'RSRC' 'NLPLA' INTO lv_exp_msgtx ##NEEDED.
+    zial_cl_log=>get( )->log_message( it_msgde = VALUE #( ( fnam = 'TEST4' low = '3456' ) ) ).
+
+    DATA(lt_act_messages) = zial_cl_log=>get( )->get_messages( ).
+    cl_abap_unit_assert=>assert_equals( exp = 5
+                                        act = lines( lt_act_messages ) ).
+
+    DATA(ls_scarr) = VALUE scarr( carrid   = 'TST'
+                                  carrname = 'Test Airline'
+                                  currcode = 'EUR'
+                                  url      = 'https://www.google.de' ).
+    INSERT INTO scarr VALUES @ls_scarr.
+
+    zial_cl_log=>get( )->save( ).
+
+    SELECT SINGLE FROM scarr
+      FIELDS @abap_true
+      WHERE carrid EQ 'TST'
+      INTO @DATA(lv_commit_done)
+      CONNECTION ('R/3*SAP_2TH_CONNECT_APPL_LOG').
+
+    IF lv_commit_done EQ abap_true.
+      DELETE FROM scarr WHERE carrid EQ 'TST'.
+      COMMIT WORK.
+    ELSE.
+      ROLLBACK WORK.
+    ENDIF.
+
+    cl_abap_unit_assert=>assert_false( lv_commit_done ).
 
   ENDMETHOD.
 
