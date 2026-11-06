@@ -111,7 +111,7 @@ INTERFACE zial_if_log_sap
   "! @parameter iv_warning | Select warning messages
   "! @parameter iv_error   | Select error messages
   "! @parameter rt_bapiret | Messages
-  METHODS get_messages_by_msgty
+  METHODS get_messages_by_type
     IMPORTING iv_success        TYPE abap_bool DEFAULT abap_false
               iv_warning        TYPE abap_bool DEFAULT abap_false
               iv_error          TYPE abap_bool DEFAULT abap_false
