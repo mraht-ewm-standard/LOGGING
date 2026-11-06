@@ -18,7 +18,7 @@ CLASS zial_cl_log_sap DEFINITION
     ALIASES log_attr                FOR zial_if_log_sap~log_attr.
     ALIASES has_error               FOR zial_if_log_sap~has_error.
     ALIASES get_last_error          FOR zial_if_log_sap~get_last_error.
-    ALIASES get_messages_by_msgty   FOR zial_if_log_sap~get_messages_by_msgty.
+    ALIASES get_messages_by_type    FOR zial_if_log_sap~get_messages_by_type.
     ALIASES save                    FOR zial_if_log_sap~save.
     ALIASES set_extnumber           FOR zial_if_log_sap~set_extnumber.
     ALIASES set_settings            FOR zial_if_log_sap~set_settings.
@@ -621,7 +621,7 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD get_messages_by_msgty.
+  METHOD get_messages_by_type.
 
     rt_bapiret = zial_cl_log=>get_messages_by_type( it_bapiret = mt_bapiret
                                                     iv_success = iv_success
