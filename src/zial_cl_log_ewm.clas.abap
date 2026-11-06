@@ -107,13 +107,13 @@ CLASS zial_cl_log_ewm IMPLEMENTATION.
 
 
   METHOD constructor.
+    " TODO: parameter IV_SAVE_CONTINOUSLY is never used (ABAP cleaner)
 
-    super->constructor( iv_object           = iv_object
-                        iv_subobject        = iv_subobject
-                        iv_extnumber        = iv_extnumber
-                        it_extnumber        = it_extnumber
-                        iv_log_part_id      = iv_log_part_id
-                        iv_save_continously = iv_save_continously ).
+    super->constructor( iv_object      = iv_object
+                        iv_subobject   = iv_subobject
+                        iv_extnumber   = iv_extnumber
+                        it_extnumber   = it_extnumber
+                        iv_log_part_id = iv_log_part_id ).
 
     mv_lgnum   = iv_lgnum.
     mo_sap_log = io_sap_log.

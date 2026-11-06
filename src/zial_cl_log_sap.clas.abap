@@ -175,6 +175,8 @@ CLASS zial_cl_log_sap DEFINITION
     METHODS save_msgde
       IMPORTING it_new_lognumbers TYPE bal_t_lgnm.
 
+    METHODS delete_old_msgde.
+
     METHODS create_log.
     METHODS change_header.
 
@@ -1011,6 +1013,8 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
       WHEN 0.
         save_msgde( lt_new_lognumbers ).
 
+        delete_old_msgde( ).
+
       WHEN OTHERS.
         DATA(lv_subrc) = sy-subrc.
         zial_cl_log=>delete( ms_log-hdr-log_handle ).
@@ -1033,10 +1037,42 @@ CLASS zial_cl_log_sap IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    " EWM: /SCWM/DLV_EXPORT_LOG
-    EXPORT msg_details FROM mt_msg_details TO DATABASE bal_indx(al) ID <ls_new_lognumber>-lognumber.
-
+    DATA(lt_msg_details) = mt_msg_details.
     CLEAR mt_msg_details.
+
+    " EWM: /SCWM/DLV_EXPORT_LOG: EXPORT / IMPORT to/from BAL_INDX
+    " => not usable as we can not commit EXPORT on 2nd connection
+    " => committing on same connection is no option as we'd like
+    "    to use the logging also in e.g. BAdIs
+
+    GET TIME STAMP FIELD DATA(lv_changed_at).
+
+    DATA(lv_xstring) = VALUE xstring( ).
+    EXPORT msg_details FROM lt_msg_details TO DATA BUFFER lv_xstring.
+    DATA(ls_msgde_xstring) = VALUE zial_t_log_msgde( client     = sy-mandt
+                                                     lognumber  = <ls_new_lognumber>-lognumber
+                                                     msgde      = lv_xstring
+                                                     changed_at = lv_changed_at ).
+    MODIFY zial_t_log_msgde FROM @ls_msgde_xstring.
+    IF sy-subrc EQ 0.
+      CALL FUNCTION 'BAL_DB_COMMIT_2ND_CONNECTION'.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD delete_old_msgde.
+
+    GET TIME STAMP FIELD DATA(lv_timestamp).
+
+    lv_timestamp = EXACT #( cl_abap_tstmp=>subtractsecs( tstmp = lv_timestamp
+                                                         secs  = ms_log-hdr-validity_period * 60 * 60 * 24 ) ).
+
+    DELETE FROM zial_t_log_msgde
+      WHERE changed_at LT lv_timestamp.
+    IF sy-subrc EQ 0.
+      CALL FUNCTION 'BAL_DB_COMMIT_2ND_CONNECTION'.
+    ENDIF.
 
   ENDMETHOD.
 
