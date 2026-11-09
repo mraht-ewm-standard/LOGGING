@@ -339,12 +339,55 @@ CLASS zial_cl_log IMPLEMENTATION.
 
   ENDMETHOD.
 
-
   METHOD display_as_popup.
 
     DATA(lt_bapiret) = it_bapiret.
-    CALL FUNCTION 'RSCRMBW_DISPLAY_BAPIRET2'
-      TABLES it_return = lt_bapiret.
+    IF lt_bapiret IS INITIAL.
+      RETURN.
+    ENDIF.
+
+    DATA(ls_log) = VALUE bal_s_log( ).
+    DATA(lv_log_handle) = VALUE balloghndl( ).
+    CALL FUNCTION 'BAL_LOG_CREATE'
+      EXPORTING  i_s_log      = ls_log
+      IMPORTING  e_log_handle = lv_log_handle
+      EXCEPTIONS OTHERS       = 1.
+    IF sy-subrc NE 0.
+      MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+              WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+    ENDIF.
+
+    LOOP AT lt_bapiret ASSIGNING FIELD-SYMBOL(<ls_bapiret>).
+      DATA(ls_msg) = CORRESPONDING bal_s_msg( <ls_bapiret> ).
+      CALL FUNCTION 'BAL_LOG_MSG_ADD'
+        EXPORTING  i_log_handle = lv_log_handle
+                   i_s_msg      = ls_msg
+        EXCEPTIONS OTHERS       = 1.
+      IF sy-subrc NE 0.
+        MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+                WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+      ENDIF.
+    ENDLOOP.
+
+    DATA(ls_display_profile) = VALUE bal_s_prof( ).
+    CALL FUNCTION 'BAL_DSP_PROFILE_POPUP_GET'
+      IMPORTING  e_s_display_profile = ls_display_profile
+      EXCEPTIONS OTHERS              = 1.
+    IF sy-subrc NE 0.
+      MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+              WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+    ENDIF.
+    ls_display_profile-use_grid = 'X'.
+
+    DATA(lt_log_handle) = VALUE bal_t_logh( ( lv_log_handle ) ).
+    CALL FUNCTION 'BAL_DSP_LOG_DISPLAY'
+      EXPORTING  i_t_log_handle      = lt_log_handle
+                 i_s_display_profile = ls_display_profile
+      EXCEPTIONS OTHERS              = 1.
+    IF sy-subrc NE 0.
+      MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno
+              WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+    ENDIF.
 
   ENDMETHOD.
 
